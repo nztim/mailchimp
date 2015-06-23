@@ -1,0 +1,21 @@
+{
+  "name": "nztim/mailchimp",
+  "description": "Mailchimp API wrapper, includes Laravel 5 support.",
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {"NZTim\\Mailchimp\\": "src/"}
+  },
+  "authors": [
+    {
+      "name": "Tim",
+      "email": "tim@nztim.com"
+    }
+  ],
+  "require": {
+    "guzzlehttp/guzzle": "^6.0",
+    "mockery/mockery": "^0.9.4"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^4.7"
+  }
+}
