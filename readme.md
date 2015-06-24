@@ -23,5 +23,4 @@ A simple API wrapper for Mailchimp API v3. Includes Laravel 5 support.
     - Networking/communications errors
     - API key incorrect
     - Attempting to check/subscribe to a list that doesn't exist
-    - MailchimpException::getUserMessage() displays relevant information
 

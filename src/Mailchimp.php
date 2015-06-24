@@ -1,7 +1,6 @@
 <?php
 namespace NZTim\Mailchimp;
 
-use Exception;
 use GuzzleHttp\Client as Guzzle;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Response;
@@ -12,11 +11,11 @@ class Mailchimp
     protected $endpoint;
     protected $client;
 
-    public function __construct($apikey, $datacenter)
+    public function __construct($apikey, $datacenter, GuzzleFactory $guzzleFactory)
     {
         $this->apikey = $apikey;
         $this->endpoint = "https://{$datacenter}.api.mailchimp.com/3.0/";
-        $this->client = new Guzzle([
+        $this->client = $guzzleFactory->createClient([
             'base_uri' => $this->endpoint,
             'timeout'  => 2.0,
             'auth' => ['nztim/mailchimp', $this->apikey],
@@ -142,28 +141,24 @@ class Mailchimp
             if(isset($headers['Authorization'])) {
                 unset($headers['Authorization']);
             }
-            $e = new MailchimpException;
-            $e->setUserMessage('Mailchimp networking error: ' . $message . json_encode($headers));
-            throw $e;
+            throw new MailchimpException('Mailchimp networking error: ' . $message . json_encode($headers));
         }
         return $response;
     }
 
     protected function otherException(Response $response)
     {
-        $e = new MailchimpException();
         if($response->getStatusCode() == 401) {
-            $e->setUserMessage('401 Unauthorized - check API key');
+            $e = new MailchimpException('401 Unauthorized - check API key');
             return $e;
         }
-        $e->setUserMessage("Unknown response: {$response->getStatusCode()} {$response->getReasonPhrase()}");
+        $e = new MailchimpException("Unknown response: {$response->getStatusCode()} {$response->getReasonPhrase()}");
         return $e;
     }
 
     protected function listDoesNotExistException($listId)
     {
-        $e = new MailchimpException;
-        $e->setUserMessage("List ID:{$listId} does not exist");
+        $e = new MailchimpException("List ID:{$listId} does not exist");
         return $e;
     }
 }
