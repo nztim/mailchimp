@@ -35,6 +35,23 @@ class Mailchimp
      */
     public function check($listId, $emailAddress)
     {
+        $result = $this->checkStatus($listId, $emailAddress);
+        if($result == 'subscribed') {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Checks the status of a list subscriber
+     * Possible statuses: 'subscribed', 'unsubscribed', 'cleaned', 'pending', or 'not found'
+     * @param $listId
+     * @param $emailAddress
+     * @return string
+     * @throws MailchimpException
+     */
+    public function checkStatus($listId, $emailAddress)
+    {
         // Check the list exists
         if(!$this->checkListExists($listId)) {
             throw $this->listDoesNotExistException($listId);
@@ -45,13 +62,10 @@ class Mailchimp
         $response = $this->callApi('get', $endpoint);
         if($response->getStatusCode() == 200) {
             $details = json_decode($response->getBody()->getContents());
-            if($details->status == 'subscribed') {
-                return true;
-            }
-            return false;
+            return $details->status;
         }
         if($response->getStatusCode() == 404) {
-            return false;
+            return 'not found';
         }
         throw $this->otherException($response);
     }
