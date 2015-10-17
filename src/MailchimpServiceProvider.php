@@ -1,6 +1,7 @@
 <?php
 namespace NZTim\Mailchimp;
 
+use App;
 use Illuminate\Support\ServiceProvider;
 
 class MailchimpServiceProvider extends ServiceProvider
@@ -10,10 +11,7 @@ class MailchimpServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->app->bind(Mailchimp::class, function() {
-            $apikey = env('MC_KEY');
-            $dc = env('MC_DC');
-            $gf = $this->app->make(GuzzleFactory::class);
-            return new Mailchimp($apikey, $dc, $gf);
+            return new Mailchimp(new DrewMMailchimp(env('MC_KEY')));
         });
     }
 

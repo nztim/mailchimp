@@ -1,26 +1,16 @@
 <?php
 namespace NZTim\Mailchimp;
 
-use GuzzleHttp\Client as Guzzle;
-use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Psr7\Response;
+use Exception;
+use Log;
 
 class Mailchimp
 {
-    protected $apikey;
-    protected $endpoint;
-    protected $client;
+    protected $drewMc;
 
-    public function __construct($apikey, $datacenter, GuzzleFactory $guzzleFactory)
+    public function __construct(DrewMMailchimp $drewMc)
     {
-        $this->apikey = $apikey;
-        $this->endpoint = "https://{$datacenter}.api.mailchimp.com/3.0/";
-        $this->client = $guzzleFactory->createClient([
-            'base_uri' => $this->endpoint,
-            'timeout'  => 2.0,
-            'auth' => ['nztim/mailchimp', $this->apikey],
-            'exceptions' => false
-        ]);
+        $this->drewMc = $drewMc;
     }
 
     /**
@@ -35,7 +25,7 @@ class Mailchimp
     public function check($listId, $emailAddress)
     {
         $result = $this->checkStatus($listId, $emailAddress);
-        if($result == 'subscribed') {
+        if($result == 'subscribed' || $result == 'pending') {
             return true;
         }
         return false;
@@ -53,20 +43,19 @@ class Mailchimp
     {
         // Check the list exists
         if(!$this->checkListExists($listId)) {
-            throw $this->listDoesNotExistException($listId);
+            throw new MailchimpException('checkStatus called on a list that does not exist (' . $listId . ')');
         }
         // Check whether the list has the subscriber
-        $id = md5($emailAddress);
+        $id = md5(strtolower($emailAddress));
         $endpoint = "lists/{$listId}/members/{$id}";
         $response = $this->callApi('get', $endpoint);
-        if($response->getStatusCode() == 200) {
-            $details = json_decode($response->getBody()->getContents());
-            return $details->status;
+        if (empty($response['status'])) {
+            throw new MailchimpException('checkStatus return value did not contain status');
         }
-        if($response->getStatusCode() == 404) {
-            return 'not found';
+        if ($response['status'] == 404) {
+            $response['status'] = 'not found';
         }
-        throw $this->otherException($response);
+        return $response['status'];
     }
 
     /**
@@ -78,32 +67,34 @@ class Mailchimp
     {
         $endpoint = "lists/{$listId}";
         $response = $this->callApi('get', $endpoint);
-        if($response->getStatusCode() == 200) {
-            return true;
-        }
-        if($response->getStatusCode() == 404) {
+        if (!empty($response['status']) && $response['status'] == 404) {
             return false;
         }
-        throw $this->otherException($response);
+        return true;
     }
 
+    /**
+     * @param integer $listId
+     * @param string $emailAddress
+     * @param array $mergeFields
+     * @param bool|false $confirm
+     * @throws MailchimpException
+     */
     public function subscribe($listId, $emailAddress, $mergeFields = [], $confirm = false)
     {
         // Check the list exists
         if(!$this->checkListExists($listId)) {
-            throw $this->listDoesNotExistException($listId);
+            throw new MailchimpException('subscribe called on list that does not exist: ' . $listId);
         }
-        // Check not already subscribed
-        $subscribed = $this->check($listId, $emailAddress);
-        if($subscribed) {
-            return true;
+        // Check address is valid for subscription
+        $status = $this->checkStatus($listId, $emailAddress);
+        if (in_array($status, ['subscribed', 'pending', 'cleaned'])) {
+            return;
         }
-        // Add the subscriber
-        $endpoint = "lists/{$listId}/members";
-        $status = 'subscribed';
-        if($confirm) {
-            $status = 'pending';
-        }
+        // Add/update the subscriber - PUT does both
+        $id = md5(strtolower($emailAddress));
+        $endpoint = "lists/{$listId}/members/{$id}";
+        $status = $confirm ? 'pending' : 'subscribed';
         $data = [
             'email_address' => $emailAddress,
             'status' => $status
@@ -111,54 +102,30 @@ class Mailchimp
         if(!empty($mergeFields)) {
             $data['merge_fields'] = $mergeFields;
         }
-        $response = $this->callApi('post', $endpoint, $data);
-        if($response->getStatusCode() == 200) {
-            return true;
+        $response = $this->callApi('put', $endpoint, $data);
+        if (empty($response['status']) || !in_array($response['status'], ['subscribed', 'pending'])) {
+            throw new MailchimpException('subscribe received unexpected response from DrewMMailchimp: ' . json_encode($response));
         }
-        throw $this->otherException($response);
     }
+
 
     /**
      * @param $method
      * @param $endpoint
-     * @param array $data
-     * @return Response
+     * @param array $data = []
+     * @return array $response
      * @throws MailchimpException
      */
     protected function callApi($method, $endpoint, $data = [])
     {
         try {
-            if($method == 'get') {
-                $response = $this->client->get($endpoint);
-            } else {
-                $response = $this->client->$method($endpoint, ['body' => json_encode($data)]);
-            }
-
-        } catch (RequestException $e) {
-            // All networking/comms errors caught here
-            $message = $e->getMessage();
-            $headers = $e->getRequest()->getHeaders();
-            if(isset($headers['Authorization'])) {
-                unset($headers['Authorization']);
-            }
-            throw new MailchimpException('Mailchimp networking error: ' . $message . json_encode($headers));
+            $response = $this->drewMc->$method($endpoint, $data);
+        } catch (Exception $e) {
+            throw new MailchimpException('DrewMMailchip exception: ' . $e->getMessage());
+        }
+        if ($response === false) {
+            throw new MailchimpException('Error in DrewMMailchimp - possible connectivity problem');
         }
         return $response;
-    }
-
-    protected function otherException(Response $response)
-    {
-        if($response->getStatusCode() == 401) {
-            $e = new MailchimpException('401 Unauthorized - check API key');
-            return $e;
-        }
-        $e = new MailchimpException("Unknown response: {$response->getStatusCode()} {$response->getReasonPhrase()}");
-        return $e;
-    }
-
-    protected function listDoesNotExistException($listId)
-    {
-        $e = new MailchimpException("List ID:{$listId} does not exist");
-        return $e;
     }
 }

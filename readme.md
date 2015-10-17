@@ -6,8 +6,8 @@ A simple API wrapper for Mailchimp API v3. Includes Laravel 5 support.
 
 - `composer require nztim/mailchimp`
 - For Laravel 5 support:
-    - Add the service provider to `config/app.php`: `'NZTim\Mailchimp\MailchimpServiceProvider',`
-    - Register the facade: `'Mailchimp' => 'NZTim\Mailchimp\MailchimpFacade',`
+    - Add the service provider to `config/app.php`: `NZTim\Mailchimp\MailchimpServiceProvider::class,`
+    - Register the facade: `'Mailchimp' => NZTim\Mailchimp\MailchimpFacade::class,`
     - Add `.env` value for `MC_KEY` (API key) and `MC_DC` (Datacenter)
     - The Datacenter is the last part of the API key, e.g. `us2`
     
