@@ -56,7 +56,7 @@ class DrewMMailchimp
      * @param  string $http_verb   The HTTP verb to use: get, post, put, patch, delete
      * @param  string $method       The API method to be called
      * @param  array  $args         Assoc array of parameters to be passed
-     * @return array|boolean        Assoc array of decoded result
+     * @return array|boolean        Assoc array of decoded result or false for failure
      * @throws
      */
     private function makeRequest($http_verb, $method, $args=array(), $timeout=10)
@@ -77,8 +77,7 @@ class DrewMMailchimp
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $this->verify_ssl);
             curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_0);
 
-
-            switch($http_verb) {
+            switch ($http_verb) {
                 case 'post':
                     curl_setopt($ch, CURLOPT_POST, true);
                     curl_setopt($ch, CURLOPT_POSTFIELDS, $json_data);
