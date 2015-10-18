@@ -3,9 +3,6 @@
 /**
  * Super-simple, minimum abstraction MailChimp API v3 wrapper
  *
- * Uses curl if available, falls back to file_get_contents and HTTP stream.
- * This probably has more comments than code.
- *
  * @author Drew McLellan <drew.mclellan@gmail.com>
  * @version 2.0
  * @license MIT

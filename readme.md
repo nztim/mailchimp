@@ -21,4 +21,6 @@ A wrapper and Laravel integration for [Drew McLellan's Mailchimp v3](https://git
     - Networking/communications errors
     - API key incorrect
     - Attempting to check/subscribe to a list that doesn't exist
-
+- Gotchas: the API throws an error when you
+    - Specify a merge field name with incorrect capitalisation
+    - Omit a required merge field when adding a new member 
