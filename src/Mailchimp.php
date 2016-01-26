@@ -156,7 +156,7 @@ class Mailchimp
         if ($response === false) {
             return $this->errorResponse('Internal error (empty result): ' . $this->drewMc->getLastError());
         }
-        if (!empty($response['status']) && is_int($response['status']) && $response['status'] >= 400 && $response['status'] <= 599) {
+        if (isset($response['status']) && is_int($response['status']) && $response['status'] >= 400 && $response['status'] <= 599 && $response['status'] != 404) {
             $message = 'Failed API call:' . var_export($response, true);
             return $this->errorResponse($message);
         }
