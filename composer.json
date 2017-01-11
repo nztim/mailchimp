@@ -12,6 +12,10 @@
     }
   ],
   "require": {
-    "php": ">=7.0.0"
+    "php": ">=7.0.0",
+    "rmccue/requests": "^1.7"
+  },
+  "require-dev": {
+    "mockery/mockery": "^0.9.7"
   }
 }

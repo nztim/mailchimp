@@ -1,9 +1,7 @@
 <?php
 namespace NZTim\Mailchimp;
 
-use App;
 use Illuminate\Support\ServiceProvider;
-use Psr\Log\LoggerInterface;
 
 class MailchimpServiceProvider extends ServiceProvider
 {
@@ -11,15 +9,19 @@ class MailchimpServiceProvider extends ServiceProvider
 
     public function boot()
     {
-        $this->app->bind(Mailchimp::class, function() {
-            return new Mailchimp(env('MC_KEY'), App::make(LoggerInterface::class));
+        $this->app->bind(Mailchimp::class, function () {
+            return new Mailchimp(env('MC_KEY'));
         });
+        $this->publishes([
+            __DIR__.'/../config/mailchimp.php' => config_path('mailchimp.php'),
+        ]);
     }
 
     public function register()
     {
-        $this->app->bind('mailchimp', function() {
+        $this->app->bind('mailchimp', function () {
             return $this->app->make(Mailchimp::class);
         });
+        $this->mergeConfigFrom(__DIR__.'/../config/mailchimp.php', 'mailchimp');
     }
 }
