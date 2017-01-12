@@ -77,4 +77,27 @@ class MailchimpTest extends PHPUnit_Framework_TestCase
         $this->api->shouldReceive('getMember')->andReturn(['status' => 'subscribed']);
         $this->assertEquals('subscribed', $this->mc->status($listId, 'notfound@example.com'));
     }
+
+    /** @test */
+    public function subscribeNewMemberConfirmsByDefault()
+    {
+        $listId = 'listId';
+        $email = 'test@example.com';
+        $this->api->shouldReceive('getList')->with($listId)->andReturn([]);
+        $this->api->shouldReceive('getMember')->andThrow(new MailchimpBadRequestException());
+        $this->api->shouldReceive('responseCodeNotFound')->andReturn(true);
+        $this->api->shouldReceive('addUpdateMember')->with($listId, $email, [], true);
+        $this->mc->subscribe($listId, $email);
+    }
+
+    /** @test */
+    public function subscribeExistingMemberTurnsOffConfirm()
+    {
+        $listId = 'listId';
+        $email = 'test@example.com';
+        $this->api->shouldReceive('getList')->with($listId)->andReturn([]);
+        $this->api->shouldReceive('getMember')->andReturn(['status' => 'subscribed']);
+        $this->api->shouldReceive('addUpdateMember')->with($listId, $email, [], false);
+        $this->mc->subscribe($listId, $email, [], true);
+    }
 }

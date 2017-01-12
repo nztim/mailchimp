@@ -19,7 +19,8 @@ Basic abstraction with Laravel integration for Mailchimp API v3
 - `Mailchimp::status($listId, $emailAddress)` determines the status of a subscriber, possible responses: 'subscribed', 'unsubscribed', 'cleaned', 'pending', 'transactional' or 'not found'
 - `Mailchimp::subscribe($listId, $emailAddress, $mergeFields = [], $confirm = true)` - adds a new subscriber to the list, or updates an existing subscriber. 
     - $mergeFields - optional array of merge fields
-    - $confirm - optional boolean, true = double-opt-in, false = immediately subscribe (permission already obtained) 
+    - $confirm - optional boolean, true = double-opt-in, false = immediately subscribe (permission already obtained)
+    - This method ensures that existing subscribers are updated but not asked to reconfirm their subscription.
 - `Mailchimp::api($method, $endpoint, $data = [])` make a call directly to the API. The endpoint should have a leading '/' and the return value is an array.
 
 ### Errors
@@ -30,19 +31,16 @@ Basic abstraction with Laravel integration for Mailchimp API v3
 - Gotchas: the API throws an error when you:
     - Specify a merge field name with incorrect capitalisation
     - Omit a required merge field when adding a new member
-    - If you `subscribe()` an existing subscriber with double-opt-in turned on, they will be asked to re-confirm. 
-        - Avoid this by checking their status beforehand.
 
 ### Examples
 
 ```php
 // Laravel:
-// Subscribe a user to your list with double-opt-in
+// Subscribe a user to your list, existing subscribers will not receive confirmation emails
 Mailchimp::subscribe('listid', 'user@domain.com'); 
 
-// Subscribe a user to your list with merge fields and turn off double-opt-in turned off
-// If the user is already subscribed, this will update their merge field data
-Mailchimp::subscribe('listid', 'user@domain.com', ['FNAME' => 'First name', 'LNAME' => 'Last name'], false); // Subscribes a user to your list
+// Subscribe a user to your list with merge fields and double-opt-in confirmation disabled
+Mailchimp::subscribe('listid', 'user@domain.com', ['FNAME' => 'First name', 'LNAME' => 'Last name'], false);
 ```
 
 
