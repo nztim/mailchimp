@@ -41,8 +41,11 @@ class MailchimpApi
             'email_address' => $email,
             'status_if_new' => $confirm ? 'pending' : 'subscribed',
             'status'        => $confirm ? 'pending' : 'subscribed',
-            'merge_fields'  => $merge,
         ];
+        // Empty array doesn't work
+        if ($merge) {
+            $data['merge_fields'] = $merge;
+        }
         $this->call('put', "/lists/{$listId}/members/{$memberId}", $data);
     }
 
