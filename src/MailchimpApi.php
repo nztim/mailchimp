@@ -71,7 +71,7 @@ class MailchimpApi
         if ($this->responseCode >= 400) {
             $this->apiError($response);
         }
-        return json_decode($response->body, true);
+        return json_decode($response->body, true) ?? [];
     }
 
     protected function options(): array
