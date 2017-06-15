@@ -18,6 +18,16 @@ class Mailchimp
         }
         $this->api = $api;
     }
+    
+    public function getLists()
+    {
+        $endpoint = "lists";
+        $response = $this->callApi('get', $endpoint);
+        if (!empty($response['status']) && ($response['status'] == 404 || $response['status'] == 401)) {
+            return false;
+        }
+        return collect($response['lists']);
+    }
 
     // Checks to see if an email address is subscribed to a list
     public function check(string $listId, string $email): bool
