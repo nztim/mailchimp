@@ -100,4 +100,11 @@ class MailchimpTest extends PHPUnit_Framework_TestCase
         $this->api->shouldReceive('addUpdateMember')->with($listId, $email, [], false);
         $this->mc->subscribe($listId, $email, [], true);
     }
+
+    /** @test */
+    public function getLists()
+    {
+        $this->api->shouldReceive('getLists')->andReturn([]);
+        $this->mc->getLists();
+    }
 }

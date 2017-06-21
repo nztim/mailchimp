@@ -23,6 +23,11 @@ class MailchimpApi
 
     // API calls --------------------------------------------------------------
 
+    public function getLists(): array
+    {
+        return $this->call('get', '/lists');
+    }
+
     public function getList(string $listId): array
     {
         return $this->call('get', '/lists/' . $listId);

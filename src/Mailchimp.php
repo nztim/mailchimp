@@ -19,6 +19,13 @@ class Mailchimp
         $this->api = $api;
     }
 
+    // Gets all available lists
+    public function getLists(): array
+    {
+        $results = $this->api->getLists();
+        return $results['lists'] ?? [];
+    }
+
     // Checks to see if an email address is subscribed to a list
     public function check(string $listId, string $email): bool
     {

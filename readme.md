@@ -21,6 +21,7 @@ Basic abstraction with Laravel integration for Mailchimp API v3
     - $mergeFields - optional array of merge fields
     - $confirm - optional boolean, true = double-opt-in, false = immediately subscribe (permission already obtained)
     - This method ensures that existing subscribers are updated but not asked to reconfirm their subscription.
+- `Mailchimp::getLists()` returns an array of all available lists.
 - `Mailchimp::api($method, $endpoint, $data = [])` make a call directly to the API. The endpoint should have a leading '/' and the return value is an array.
 
 ### Errors
