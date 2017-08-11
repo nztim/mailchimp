@@ -10,7 +10,7 @@ class MailchimpServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->app->bind(Mailchimp::class, function () {
-            return new Mailchimp(env('MC_KEY'));
+            return new Mailchimp(config('mailchimp.apikey'));
         });
         $this->publishes([
             __DIR__.'/../config/mailchimp.php' => config_path('mailchimp.php'),
