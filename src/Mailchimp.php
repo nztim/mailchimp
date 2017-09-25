@@ -62,6 +62,15 @@ class Mailchimp
         }
         $this->api->addUpdateMember($listId, $email, $mergeFields, $confirm);
     }
+    
+    // Remove a member from the list if exists in it
+    public function unsubscribe(string $listId, string $email)
+    {
+        if ($this->check($listId, $email))
+        {
+            return $this->api('delete', '/lists/'.$listId.'/members/'.md5($email).'/');
+        }
+    }
 
     // Make an API call directly
     public function api(string $method, string $endpoint, array $data = []): array
