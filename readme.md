@@ -17,8 +17,9 @@ Basic abstraction with Laravel integration for Mailchimp API v3
 
 - `Mailchimp::check($listId, $emailAddress)` checks to see if an email address is subscribed to a list, returns boolean
 - `Mailchimp::status($listId, $emailAddress)` determines the status of a subscriber, possible responses: 'subscribed', 'unsubscribed', 'cleaned', 'pending', 'transactional' or 'not found'
-- `Mailchimp::subscribe($listId, $emailAddress, $mergeFields = [], $confirm = true)` - adds a new subscriber to the list, or updates an existing subscriber. 
+- `Mailchimp::subscribe($listId, $emailAddress, $mergeFields = [], $interestsFields = [], $confirm = true)` - adds a new subscriber to the list, or updates an existing subscriber. 
     - $mergeFields - optional array of merge fields
+    - $interestsFields - optional array of interests (also called groups) fields
     - $confirm - optional boolean, true = double-opt-in, false = immediately subscribe (permission already obtained)
     - This method ensures that existing subscribers are updated but not asked to reconfirm their subscription.
 - `Mailchimp::getLists()` returns an array of all available lists.
@@ -40,7 +41,7 @@ Basic abstraction with Laravel integration for Mailchimp API v3
 // Subscribe a user to your list, existing subscribers will not receive confirmation emails
 Mailchimp::subscribe('listid', 'user@domain.com'); 
 
-// Subscribe a user to your list with interests (also called groups) and with merge fields and double-opt-in confirmation disabled
+// Subscribe a user to your list with interests and with merge fields and double-opt-in confirmation disabled
 Mailchimp::subscribe('listid', 'user@domain.com', ['460bbbfda1' => true, 'f32e08993d' => false], ['FNAME' => 'First name', 'LNAME' => 'Last name'], false);
 ```
 
