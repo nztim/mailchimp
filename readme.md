@@ -40,8 +40,8 @@ Basic abstraction with Laravel integration for Mailchimp API v3
 // Subscribe a user to your list, existing subscribers will not receive confirmation emails
 Mailchimp::subscribe('listid', 'user@domain.com'); 
 
-// Subscribe a user to your list with merge fields and double-opt-in confirmation disabled
-Mailchimp::subscribe('listid', 'user@domain.com', ['FNAME' => 'First name', 'LNAME' => 'Last name'], false);
+// Subscribe a user to your list with interests (also called groups) and with merge fields and double-opt-in confirmation disabled
+Mailchimp::subscribe('listid', 'user@domain.com', ['460bbbfda1' => true, 'f32e08993d' => false], ['FNAME' => 'First name', 'LNAME' => 'Last name'], false);
 ```
 
 
