@@ -6,7 +6,6 @@ use NZTim\Mailchimp\Exception\MailchimpInternalErrorException;
 use Requests;
 use Requests_Auth_Basic;
 use Requests_Response;
-use Throwable;
 
 class MailchimpApi
 {
@@ -52,6 +51,12 @@ class MailchimpApi
             $data['merge_fields'] = $merge;
         }
         $this->call('put', "/lists/{$listId}/members/{$memberId}", $data);
+    }
+
+    public function unsubscribe(string $listId, string $email)
+    {
+        $memberId = md5($email);
+        $this->call('put', "/lists/{$listId}/members/{$memberId}", ['email_address' => $email, 'status_if_new' => 'unsubscribed', 'status' => 'unsubscribed']);
     }
 
     // HTTP -------------------------------------------------------------------

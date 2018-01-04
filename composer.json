@@ -3,7 +3,9 @@
   "description": "Mailchimp API wrapper, includes Laravel 5 support.",
   "license": "MIT",
   "autoload": {
-    "psr-4": {"NZTim\\Mailchimp\\": "src/"}
+    "psr-4": {
+      "NZTim\\Mailchimp\\": "src/"
+    }
   },
   "authors": [
     {
@@ -13,9 +15,10 @@
   ],
   "require": {
     "php": ">=7.0.0",
-    "rmccue/requests": "^1.7"
+    "rmccue/requests": "^1.7",
+    "phpunit/phpunit": "^6.5"
   },
   "require-dev": {
-    "mockery/mockery": "^0.9.7"
+    "mockery/mockery": "~1.0"
   }
 }

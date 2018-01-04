@@ -26,13 +26,6 @@ class Mailchimp
         return $results['lists'] ?? [];
     }
 
-    // Checks to see if an email address is subscribed to a list
-    public function check(string $listId, string $email): bool
-    {
-        $result = $this->status($listId, $email);
-        return in_array($result, ['subscribed',  'pending']);
-    }
-
      // Determines the status of a subscriber
      // Possible responses: 'subscribed', 'unsubscribed', 'cleaned', 'pending', 'transactional' or 'not found'
     public function status(string $listId, string $email): string
@@ -53,6 +46,13 @@ class Mailchimp
         return $member['status'];
     }
 
+    // Checks to see if an email address is subscribed to a list
+    public function check(string $listId, string $email): bool
+    {
+        $result = $this->status($listId, $email);
+        return in_array($result, ['subscribed',  'pending']);
+    }
+
     // Add a member to the list or update an existing member
     // Ensures that existing subscribers are not asked to reconfirm
     public function subscribe(string $listId, string $email, array $mergeFields = [], bool $confirm = true)
@@ -61,6 +61,14 @@ class Mailchimp
             $confirm = false;
         }
         $this->api->addUpdateMember($listId, $email, $mergeFields, $confirm);
+    }
+
+    public function unsubscribe(string $listId, string $email)
+    {
+        if (!$this->check($listId, $email)) {
+            return;
+        }
+        $this->api->unsubscribe($listId, $email);
     }
 
     // Make an API call directly
