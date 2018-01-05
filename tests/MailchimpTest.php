@@ -115,7 +115,7 @@ class MailchimpTest extends TestCase
         $this->api->shouldReceive('getList')->with(self::LISTID)->andReturn([]);
         $this->api->shouldReceive('getMember')->andThrow(new MailchimpBadRequestException);
         $this->api->shouldReceive('responseCodeNotFound')->andReturn(true);
-        $this->api->shouldReceive('addUpdateMember')->with(self::LISTID, 'user@example.com', [], true); // true = confirmation required
+        $this->api->shouldReceive('addUpdate')->with(self::LISTID, 'user@example.com', [], true); // true = confirmation required
         $this->mc->subscribe(self::LISTID, 'user@example.com');
     }
 
@@ -124,7 +124,7 @@ class MailchimpTest extends TestCase
     {
         $this->api->shouldReceive('getList')->with(self::LISTID)->andReturn([]);
         $this->api->shouldReceive('getMember')->andReturn(['status' => 'subscribed']);
-        $this->api->shouldReceive('addUpdateMember')->with(self::LISTID, 'test@example.com', [], false);
+        $this->api->shouldReceive('addUpdate')->with(self::LISTID, 'test@example.com', [], false);
         $this->mc->subscribe(self::LISTID, 'test@example.com', [], true);
     }
 

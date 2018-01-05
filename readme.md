@@ -9,12 +9,12 @@ Basic abstraction with Laravel integration for Mailchimp API v3
     - Add the service provider to `config/app.php`: `NZTim\Mailchimp\MailchimpServiceProvider::class,`
     - Register the facade: `'Mailchimp' => NZTim\Mailchimp\MailchimpFacade::class,`
     - Add `.env` value for `MC_KEY` (API key)
-    - Optionally publish the config file: `php artisan vendor:publish --provider=NZTim\Mailchimp\MailchimpServiceProvider`
+    - Optionally publish the config file:
+        - `php artisan vendor:publish --provider=NZTim\Mailchimp\MailchimpServiceProvider`
 
 ### Usage
-- Within Laravel 5, use the `Mailchimp` facade or instantiate via the container `app(NZTim\Mailchimp\Mailchimp::class)`.
-    - Alternatively, instantiate manually using the API key in the constructor: `$mc = new NZTim\Mailchimp\Mailchimp($apikey)`
-
+- Within Laravel 5, use the `Mailchimp` facade or inject `NZTim\Mailchimp\Mailchimp` using the container.
+- Alternatively, instantiate manually using the API key: `$mc = new NZTim\Mailchimp\Mailchimp($apikey)`
 - `Mailchimp::getLists()` returns an array of all available lists.
 - `Mailchimp::check($listId, $emailAddress)` checks to see if an email address is subscribed to a list, returns boolean
 - `Mailchimp::status($listId, $emailAddress)` determines the status of a subscriber, possible responses: 'subscribed', 'unsubscribed', 'cleaned', 'pending', 'transactional' or 'not found'
@@ -24,6 +24,15 @@ Basic abstraction with Laravel integration for Mailchimp API v3
     - This method ensures that existing subscribers are updated but not asked to reconfirm their subscription.
 - `Mailchimp::unsubscribe($listId, $emailAddress)` unsubscribes a member from a list (sets status to 'unsubscribed').
 - `Mailchimp::api($method, $endpoint, $data = [])` make a call directly to the API. The endpoint should have a leading '/' and the return value is an array.
+
+For access to all the member properties available in the API, use the Member class to subscribe and update list members:
+
+```php
+$member = (new NZTim\Mailchimp\Member($email))->merge(['FNAME' => 'First name'])->email_type('text')->confirm(false);
+Mailchimp::subscribeMember($member);
+```
+
+As with the `subscribe()` method, double-opt-in is default but existing members will not be asked to re-verify so you can use the same methods for create and update without needing to check.
 
 ### Errors
 
@@ -43,6 +52,10 @@ Mailchimp::subscribe('listid', 'user@domain.com');
 
 // Subscribe a user to your list with merge fields and double-opt-in confirmation disabled
 Mailchimp::subscribe('listid', 'user@domain.com', ['FNAME' => 'First name', 'LNAME' => 'Last name'], false);
+
+// Subscribe/update a user using the Member class
+$member = (new NZTim\Mailchimp\Member($email))->interests(['abc123fed' => true])->language('th');
+Mailchimp::subscribeMember('listid', $member);
 ```
 
 

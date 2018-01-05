@@ -60,7 +60,15 @@ class Mailchimp
         if ($this->status($listId, $email) == 'subscribed') {
             $confirm = false;
         }
-        $this->api->addUpdateMember($listId, $email, $mergeFields, $confirm);
+        $this->api->addUpdate($listId, $email, $mergeFields, $confirm);
+    }
+
+    public function subscribeMember(string $listId, Member $member)
+    {
+        if ($this->status($listId, $member->parameters()['email']) == 'subscribed') {
+            $member->confirm(false);
+        }
+        $this->api->addUpdateMember($listId, $member);
     }
 
     public function unsubscribe(string $listId, string $email)
