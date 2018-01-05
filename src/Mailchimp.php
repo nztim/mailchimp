@@ -63,9 +63,9 @@ class Mailchimp
         $this->api->addUpdate($listId, $email, $mergeFields, $confirm);
     }
 
-    public function subscribeMember(string $listId, Member $member)
+    public function addUpdateMember(string $listId, Member $member)
     {
-        if ($this->status($listId, $member->parameters()['email']) == 'subscribed') {
+        if ($this->status($listId, $member->parameters()['email_address']) == 'subscribed') {
             $member->confirm(false);
         }
         $this->api->addUpdateMember($listId, $member);

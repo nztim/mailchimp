@@ -29,7 +29,7 @@ For access to all the member properties available in the API, use the Member cla
 
 ```php
 $member = (new NZTim\Mailchimp\Member($email))->merge(['FNAME' => 'First name'])->email_type('text')->confirm(false);
-Mailchimp::subscribeMember($member);
+Mailchimp::addUpdateMember($member);
 ```
 
 As with the `subscribe()` method, double-opt-in is default but existing members will not be asked to re-verify so you can use the same methods for create and update without needing to check.
@@ -55,7 +55,7 @@ Mailchimp::subscribe('listid', 'user@domain.com', ['FNAME' => 'First name', 'LNA
 
 // Subscribe/update a user using the Member class
 $member = (new NZTim\Mailchimp\Member($email))->interests(['abc123fed' => true])->language('th');
-Mailchimp::subscribeMember('listid', $member);
+Mailchimp::addUpdateMember('listid', $member);
 ```
 
 

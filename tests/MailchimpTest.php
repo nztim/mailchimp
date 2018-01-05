@@ -151,4 +151,27 @@ class MailchimpTest extends TestCase
         $this->api->shouldReceive('call')->with('someMethod', 'endpoint', ['data' => 123])->andReturn(['test' => 'result']);
         $this->assertEquals(['test' => 'result'], $this->mc->api('someMethod', 'endpoint', ['data' => 123]));
     }
+
+    /** @test */
+    public function add_update_member_new()
+    {
+        $member = (new \NZTim\Mailchimp\Member('test@example.com'));
+        $this->api->shouldReceive('getList')->with(self::LISTID)->andReturn([]);
+        $this->api->shouldReceive('getMember')->andThrow(new MailchimpBadRequestException);
+        $this->api->shouldReceive('responseCodeNotFound')->andReturn(true);
+        $this->api->shouldReceive('addUpdateMember')->with(self::LISTID, $member);
+        $this->mc->addUpdateMember(self::LISTID, $member);
+        $this->assertEquals('pending', $member->parameters()['status_if_new']);
+    }
+
+    /** @test */
+    public function add_update_member_existing()
+    {
+        $member = (new \NZTim\Mailchimp\Member('test@example.com'));
+        $this->api->shouldReceive('getList')->with(self::LISTID)->andReturn([]);
+        $this->api->shouldReceive('getMember')->andReturn(['status' => 'subscribed']);
+        $this->api->shouldReceive('addUpdateMember')->with(self::LISTID, $member);
+        $this->mc->addUpdateMember(self::LISTID, $member);
+        $this->assertEquals('subscribed', $member->parameters()['status']);
+    }
 }
