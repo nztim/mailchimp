@@ -14,18 +14,31 @@ Basic abstraction with Laravel integration for Mailchimp API v3
 
 ### Usage
 - Within Laravel 5, use the `Mailchimp` facade or inject `NZTim\Mailchimp\Mailchimp` using the container.
-- Alternatively, instantiate manually using the API key: `$mc = new NZTim\Mailchimp\Mailchimp($apikey)`
-- `Mailchimp::getLists()` returns an array of all available lists.
-- `Mailchimp::check($listId, $emailAddress)` checks to see if an email address is subscribed to a list, returns boolean
-- `Mailchimp::status($listId, $emailAddress)` determines the status of a subscriber, possible responses: 'subscribed', 'unsubscribed', 'cleaned', 'pending', 'transactional' or 'not found'
-- `Mailchimp::subscribe($listId, $emailAddress, $mergeFields = [], $confirm = true)` - adds a new subscriber to the list, or updates an existing subscriber.
-    - $mergeFields - optional array of merge fields
-    - $confirm - optional boolean, true = double-opt-in, false = immediately subscribe (permission already obtained)
-    - This method ensures that existing subscribers are updated but not asked to reconfirm their subscription.
-- `Mailchimp::unsubscribe($listId, $emailAddress)` unsubscribes a member from a list (sets status to 'unsubscribed').
-- `Mailchimp::api($method, $endpoint, $data = [])` make a call directly to the API. The endpoint should have a leading '/' and the return value is an array.
+- Alternatively, instantiate using the API key: `$mc = new NZTim\Mailchimp\Mailchimp($apikey)`
 
-For access to all the member properties available in the API, use the Member class to subscribe and update list members:
+```php
+// Get an array of all available lists:
+Mailchimp::getLists();
+
+// Check to see if an email address is subscribed to a list:
+Mailchimp::check($listId, $emailAddress); // Returns boolean
+
+// Check the staus of a subscriber:
+Mailchimp::status($listId, $emailAddress); // Returns 'subscribed', 'unsubscribed', 'cleaned', 'pending', 'transactional' or 'not found'
+
+// Adds/updates an existing subscriber:
+Mailchimp::subscribe($listId, $emailAddress, $merge = [], $confirm = true);
+// Use $confirm = false to skip double-opt-in if you already have permission.
+// This method will update an existing subscriber and will not ask an existing subscriber to re-confirm.
+
+// Unsubscribe a member (set status to 'unsubscribed'):
+Mailchimp::unsubscribe($listId, $emailAddress);
+
+// Directly call the API:
+Mailchimp::api($method, $endpoint, $data = []); // The endpoint should have a leading '/', returns an array.
+```
+
+For access to all the member properties available in the v3 API, use the Member class to subscribe and update list members:
 
 ```php
 $member = (new NZTim\Mailchimp\Member($email))->merge(['FNAME' => 'First name'])->email_type('text')->confirm(false);
