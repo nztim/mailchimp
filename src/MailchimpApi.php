@@ -105,10 +105,10 @@ class MailchimpApi
     {
         $info = var_export(json_decode($response->body, true), true);
         $message = "Mailchimp API error (" . $response->status_code . "): " . $info;
-        if ($this->responseCode() <= 499) {
-            throw new MailchimpBadRequestException($message);
+        if ($this->responseCode <= 499) {
+            throw new MailchimpBadRequestException($message, $this->responseCode, null, $response->body);
         }
-        throw new MailchimpInternalErrorException($message);
+        throw new MailchimpInternalErrorException($message, $this->responseCode);
     }
 
     public function responseCode(): int
