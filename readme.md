@@ -35,7 +35,7 @@ Mailchimp::subscribe($listId, $emailAddress, $merge = [], $confirm = true);
 Mailchimp::unsubscribe($listId, $emailAddress);
 
 // Directly call the API:
-Mailchimp::api($method, $endpoint, $data = []); // The endpoint should have a leading '/', returns an array.
+Mailchimp::api($method, $endpoint, $data = []); // Returns an array.
 ```
 
 For access to all the member properties available in the v3 API, use the Member class to subscribe and update list members:

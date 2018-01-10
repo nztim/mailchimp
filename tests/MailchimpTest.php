@@ -148,8 +148,15 @@ class MailchimpTest extends TestCase
     /** @test */
     public function api_passes_call_through()
     {
-        $this->api->shouldReceive('call')->with('someMethod', 'endpoint', ['data' => 123])->andReturn(['test' => 'result']);
-        $this->assertEquals(['test' => 'result'], $this->mc->api('someMethod', 'endpoint', ['data' => 123]));
+        $this->api->shouldReceive('call')->with('someMethod', '/endpoint', ['data' => 123])->andReturn(['test' => 'result']);
+        $this->assertEquals(['test' => 'result'], $this->mc->api('someMethod', '/endpoint', ['data' => 123]));
+    }
+
+    /** @test */
+    public function api_handles_endpoint_without_leading_slash()
+    {
+        $this->api->shouldReceive('call')->with('get', '/endpoint', [])->andReturn(['data' => 123])->once();
+        $this->assertEquals(['data' => 123], $this->mc->api('get', 'endpoint'));
     }
 
     /** @test */

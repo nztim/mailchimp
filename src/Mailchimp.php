@@ -82,6 +82,7 @@ class Mailchimp
     // Make an API call directly
     public function api(string $method, string $endpoint, array $data = []): array
     {
+        $endpoint = '/' . ltrim($endpoint, '/'); // Ensure leading slash is present
         return $this->api->call($method, $endpoint, $data);
     }
 
