@@ -15,10 +15,10 @@
   ],
   "require": {
     "php": ">=7.0.0",
-    "rmccue/requests": "^1.7",
-    "phpunit/phpunit": "^6.5"
+    "rmccue/requests": "^1.7"
   },
   "require-dev": {
-    "mockery/mockery": "~1.0"
+    "mockery/mockery": "~1.0",
+    "phpunit/phpunit": "^6.5"
   }
 }
