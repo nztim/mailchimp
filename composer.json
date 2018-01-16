@@ -1,24 +1,34 @@
 {
-  "name": "nztim/mailchimp",
-  "description": "Mailchimp API wrapper, includes Laravel 5 support.",
-  "license": "MIT",
-  "autoload": {
-    "psr-4": {
-      "NZTim\\Mailchimp\\": "src/"
+    "name": "nztim/mailchimp",
+    "description": "Mailchimp API wrapper, includes Laravel 5 support.",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Tim",
+            "email": "tim@nztim.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.0.0",
+        "rmccue/requests": "^1.7"
+    },
+    "require-dev": {
+        "mockery/mockery": "~1.0",
+        "phpunit/phpunit": "^6.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "NZTim\\Mailchimp\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "NZTim\\Mailchimp\\MailchimpServiceProvider"
+            ],
+            "aliases": {
+                "Mailchimp": "NZTim\\Mailchimp\\MailchimpFacade"
+            }
+        }
     }
-  },
-  "authors": [
-    {
-      "name": "Tim",
-      "email": "tim@nztim.com"
-    }
-  ],
-  "require": {
-    "php": ">=7.0.0",
-    "rmccue/requests": "^1.7"
-  },
-  "require-dev": {
-    "mockery/mockery": "~1.0",
-    "phpunit/phpunit": "^6.5"
-  }
 }
