@@ -5,14 +5,16 @@ Basic abstraction with Laravel integration for Mailchimp API v3
 ### Installation
 
 - `composer require nztim/mailchimp`
-- For Laravel 5 support:
-    - Add the service provider to `config/app.php`: `NZTim\Mailchimp\MailchimpServiceProvider::class,`
-    - Register the facade: `'Mailchimp' => NZTim\Mailchimp\MailchimpFacade::class,`
-    - Add `.env` value for `MC_KEY` (API key)
-    - Optionally publish the config file:
+- For Laravel support:
+    - Laravel 5.5+ will auto-discover the package, for earlier versions you will need to:
+        - Add the service provider to `config/app.php`: `NZTim\Mailchimp\MailchimpServiceProvider::class,`
+        - Register the facade: `'Mailchimp' => NZTim\Mailchimp\MailchimpFacade::class,`
+    - Add an `.env` value for `MC_KEY` (your API key)
+    - Optionally, publish the config file:
         - `php artisan vendor:publish --provider=NZTim\Mailchimp\MailchimpServiceProvider`
 
 ### Usage
+
 - Within Laravel 5, use the `Mailchimp` facade or inject `NZTim\Mailchimp\Mailchimp` using the container.
 - Alternatively, instantiate using the API key: `$mc = new NZTim\Mailchimp\Mailchimp($apikey)`
 
