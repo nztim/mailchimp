@@ -60,7 +60,7 @@ class MailchimpApi
 
     public function unsubscribe(string $listId, string $email)
     {
-        $memberId = md5($email);
+        $memberId = md5(strtolower($email));
         $this->call('put', "/lists/{$listId}/members/{$memberId}", ['email_address' => $email, 'status_if_new' => 'unsubscribed', 'status' => 'unsubscribed']);
     }
 
