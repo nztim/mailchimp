@@ -73,7 +73,9 @@ class MailchimpApi
             throw new MailchimpException('Invalid API call method: ' . $method);
         }
         if (in_array($method, ['get', 'delete'])) {
-            $response = Requests::$method($this->baseurl . $endpoint, $this->headers(), $this->options());
+            $url = $this->baseurl . $endpoint;
+            $url .= $data ? '?' . http_build_query($data) : '';
+            $response = Requests::$method($url, $this->headers(), $this->options());
         } else {
             $response = Requests::$method(
                 $this->baseurl . $endpoint,
