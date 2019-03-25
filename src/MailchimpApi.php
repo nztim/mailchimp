@@ -22,9 +22,9 @@ class MailchimpApi
 
     // API calls --------------------------------------------------------------
 
-    public function getLists(): array
+    public function getLists($rowsCount = 10): array
     {
-        return $this->call('get', '/lists');
+        return $this->call('get', '/lists', ['count' => $rowsCount]);
     }
 
     public function getList(string $listId): array
