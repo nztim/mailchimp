@@ -39,6 +39,13 @@ class MailchimpTest extends TestCase
         $this->assertEquals(['1', '2', '3'], $this->mc->getLists());
     }
 
+    /** @test */
+    public function get_lists_with_params()
+    {
+        $this->api->shouldReceive('getLists')->with([1, 2, 3])->andReturn(['lists' => ['1', '2', '3']]);
+        $this->assertEquals(['1', '2', '3'], $this->mc->getLists([1, 2, 3]));
+    }
+
     /**
      * @test
      * @expectedException NZTim\Mailchimp\Exception\MailchimpBadRequestException

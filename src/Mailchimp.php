@@ -19,10 +19,9 @@ class Mailchimp
         $this->api = $api;
     }
 
-    // Gets all available lists
-    public function getLists(): array
+    public function getLists(array $params = []): array
     {
-        $results = $this->api->getLists();
+        $results = $this->api->getLists($params);
         return $results['lists'] ?? [];
     }
 

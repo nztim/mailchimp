@@ -24,6 +24,9 @@ Basic abstraction with Laravel integration for Mailchimp API v3
 // Get an array of all available lists:
 Mailchimp::getLists();
 
+// Get lists with parameters - get IDs of lists a user is subscribed to:
+Mailchimp::getLists(['email' => 'user@example.com', 'fields' => 'lists.id']);
+
 // Check to see if an email address is subscribed to a list:
 Mailchimp::check($listId, $emailAddress); // Returns boolean
 
