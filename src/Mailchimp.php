@@ -102,6 +102,6 @@ class Mailchimp
         if (!isset($member['status'])) {
             return false;
         }
-        return in_array($member['status'], ['subscribed', 'unsubscribed', 'cleaned', 'pending', 'transactional']);
+        return in_array($member['status'], ['subscribed', 'unsubscribed', 'cleaned', 'pending', 'transactional','archived']);
     }
 }
