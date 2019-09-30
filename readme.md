@@ -48,7 +48,7 @@ Mailchimp::api($method, $endpoint, $data = []); // Returns an array.
 For access to all the member properties available in the v3 API, use the Member class to subscribe and update list members:
 
 ```php
-$member = (new NZTim\Mailchimp\Member($email))->merge(['FNAME' => 'First name'])->email_type('text')->confirm(false);
+$member = (new NZTim\Mailchimp\Member($email))->merge_fields(['FNAME' => 'First name'])->email_type('text')->confirm(false);
 Mailchimp::addUpdateMember($member);
 ```
 
