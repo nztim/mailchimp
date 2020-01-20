@@ -37,7 +37,7 @@ class MailchimpApi
         return $this->call('get', "/lists/{$listId}/members/{$memberId}");
     }
 
-    public function addUpdate(string $listId, string $email, array $merge, bool $confirm)
+    public function addUpdate(string $listId, string $email, array $merge, bool $confirm): array
     {
         $email = strtolower($email);
         $memberId = md5($email);
@@ -50,10 +50,10 @@ class MailchimpApi
         if ($merge) {
             $data['merge_fields'] = $merge;
         }
-        $this->call('put', "/lists/{$listId}/members/{$memberId}", $data);
+        return $this->call('put', "/lists/{$listId}/members/{$memberId}", $data);
     }
 
-    public function addUpdateMember(string $listId, Member $member)
+    public function addUpdateMember(string $listId, Member $member) 
     {
         $this->call('put', "/lists/{$listId}/members/{$member->hash()}", $member->parameters());
     }
