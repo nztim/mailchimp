@@ -1,7 +1,5 @@
 # Mailchimp
 
-[![Build Status](https://travis-ci.org/nztim/mailchimp.svg?branch=master)](https://travis-ci.org/nztim/mailchimp)
-
 Basic abstraction with Laravel integration for Mailchimp API v3
 
 ### Installation
