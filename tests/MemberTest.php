@@ -5,14 +5,12 @@ use PHPUnit\Framework\TestCase;
 
 class MemberTest extends TestCase
 {
-    private $email = 'test@example.com';
+    private string $email = 'test@example.com';
 
-    /**
-     * @test
-     * @expectedException InvalidArgumentException
-     */
+    /** @test */
     public function valid_email_address_required()
     {
+        $this->expectException(InvalidArgumentException::class);
         new Member('invalid');
     }
 
@@ -24,12 +22,10 @@ class MemberTest extends TestCase
         $this->assertEquals(['email_address' => $this->email, 'status_if_new' => 'pending'], $member->parameters());
     }
 
-    /**
-     * @test
-     * @expectedException InvalidArgumentException
-     */
+    /** @test */
     public function email_type_invalid()
     {
+        $this->expectException(InvalidArgumentException::class);
         (new Member($this->email))->email_type('invalid');
     }
 
@@ -40,12 +36,10 @@ class MemberTest extends TestCase
         $this->assertEquals('html', $member->parameters()['email_type']);
     }
 
-    /**
-     * @test
-     * @expectedException InvalidArgumentException
-     */
+    /** @test */
     public function status_invalid()
     {
+        $this->expectException(InvalidArgumentException::class);
         (new Member($this->email))->status('invalid');
     }
 
@@ -88,12 +82,10 @@ class MemberTest extends TestCase
         $this->assertEquals($interests, $member->parameters()['interests']);
     }
 
-    /**
-     * @test
-     * @expectedException InvalidArgumentException
-     */
+    /** @test */
     public function language_invalid()
     {
+        $this->expectException(InvalidArgumentException::class);
         (new Member($this->email))->language('invalid');
     }
 
