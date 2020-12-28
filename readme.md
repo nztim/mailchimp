@@ -83,10 +83,9 @@ $member = (new NZTim\Mailchimp\Member($email))->interests(['abc123fed' => true])
 Mailchimp::addUpdateMember('listid', $member);
 ```
 
-
 ### Upgrading
 - To v4.0:
-    - PHP 7.4|8.0 is now required
+    - PHP 7.4 | 8.0 is now required
     - Use archive/delete in place of unsubscribe in order to prevent reaching the free limit.  
 - To v3.0:
     - Exceptions are now thrown for all errors, use try/catch where necessary
