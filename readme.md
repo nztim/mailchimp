@@ -39,6 +39,12 @@ Mailchimp::subscribe($listId, $emailAddress, $merge = [], $confirm = true);
 // Unsubscribe a member (set status to 'unsubscribed'):
 Mailchimp::unsubscribe($listId, $emailAddress);
 
+// Archive a member (no longer counts towards audience limits):
+Mailchimp::archive($listId, $emailAddress);
+
+// Permanently delete a member record:
+Mailchimp::delete($listId, $emailAddress);
+
 // Directly call the API:
 Mailchimp::api($method, $endpoint, $data = []); // Returns an array.
 ```
@@ -79,6 +85,9 @@ Mailchimp::addUpdateMember('listid', $member);
 
 
 ### Upgrading
+- To v4.0:
+    - PHP 7.4|8.0 is now required
+    - Use archive/delete in place of unsubscribe in order to prevent reaching the free limit.  
 - To v3.0:
     - Exceptions are now thrown for all errors, use try/catch where necessary
     - Double-opt-in is now the default, update `Mailchimp::subscribe()` as required

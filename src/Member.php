@@ -1,27 +1,44 @@
 <?php namespace NZTim\Mailchimp;
 
+use InvalidArgumentException;
+
 class Member
 {
-    /** @var string */
-    private $subscriber_hash;
-
-    private $parameters;
+    private string $email;
+    private string $hash;
+    private array $parameters;
 
     public function __construct(string $email)
     {
         $email = strtolower(trim($email));
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            throw new \InvalidArgumentException("Invalid email address");
+            throw new InvalidArgumentException("Invalid email address");
         }
-        $this->subscriber_hash = md5($email);
+        $this->email = $email;
+        $this->hash = md5($email);
         $this->parameters['email_address'] = $email;
         $this->parameters['status_if_new'] = 'pending'; // Double-opt-in is default
+    }
+
+    public function email(): string
+    {
+        return $this->email;
+    }
+
+    public function hash(): string
+    {
+        return $this->hash;
+    }
+
+    public function parameters(): array
+    {
+        return $this->parameters;
     }
 
     public function email_type(string $type): Member
     {
         if (!in_array($type, ['html', 'text'])) {
-            throw new \InvalidArgumentException('Type must be html or text');
+            throw new InvalidArgumentException('Type must be html or text');
         }
         $this->parameters['email_type'] = $type;
         return $this;
@@ -30,8 +47,8 @@ class Member
     // Note this doesn't affect status_if_new, therefore it's not possible to add a new member as unsubscribed or cleaned
     public function status(string $status): Member
     {
-        if (!in_array($status, ['subscribed', 'unsubscribed', 'cleaned', 'pending'])) {
-            throw new \InvalidArgumentException('Status must be subscribed, unsubscribed, cleaned or pending');
+        if (!in_array($status, ['subscribed', 'unsubscribed', 'cleaned', 'pending', 'transactional', 'archived'])) {
+            throw new InvalidArgumentException('Status must be subscribed, unsubscribed, cleaned, pending, transactional or archived');
         }
         $this->parameters['status'] = $status;
         return $this;
@@ -59,7 +76,7 @@ class Member
     public function language(string $language): Member
     {
         if (!in_array($language, $this->valid_languages)) {
-            throw new \InvalidArgumentException('Invalid language code, see https://kb.mailchimp.com/lists/manage-contacts/view-and-edit-subscriber-languages');
+            throw new InvalidArgumentException('Invalid language code, see https://kb.mailchimp.com/lists/manage-contacts/view-and-edit-subscriber-languages');
         }
         $this->parameters['language'] = $language;
         return $this;
@@ -104,17 +121,7 @@ class Member
 //        return $this;
 //    }
 
-    public function hash(): string
-    {
-        return $this->subscriber_hash;
-    }
-
-    public function parameters(): array
-    {
-        return $this->parameters;
-    }
-
-    protected $valid_languages = [
+    protected array $valid_languages = [
         "en",
         "ar",
         "af",

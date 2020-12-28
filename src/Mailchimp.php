@@ -78,6 +78,16 @@ class Mailchimp
         $this->api->unsubscribe($listId, $email);
     }
 
+    public function archive(string $listId, string $email)
+    {
+        $this->api->archive($listId, $email);
+    }
+
+    public function delete(string $listId, string $email)
+    {
+        $this->api->delete($listId, $email);
+    }
+
     // Make an API call directly
     public function api(string $method, string $endpoint, array $data = []): array
     {

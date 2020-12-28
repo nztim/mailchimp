@@ -3,9 +3,8 @@
 use NZTim\Mailchimp\Exception\MailchimpBadRequestException;
 use NZTim\Mailchimp\Exception\MailchimpException;
 use NZTim\Mailchimp\Exception\MailchimpInternalErrorException;
-use Requests;
-use Requests_Auth_Basic;
-use Requests_Response;
+use NZTim\SimpleHttp\Http;
+use NZTim\SimpleHttp\HttpResponse;
 
 class MailchimpApi
 {
@@ -64,51 +63,50 @@ class MailchimpApi
         $this->call('put', "/lists/{$listId}/members/{$memberId}", ['email_address' => $email, 'status_if_new' => 'unsubscribed', 'status' => 'unsubscribed']);
     }
 
+    public function archive(string $listId, string $email)
+    {
+        $memberId = md5(strtolower($email));
+        $this->call('delete', "/lists/{$listId}/members/{$memberId}", ['email_address' => $email]);
+    }
+
+    public function delete(string $listId, string $email)
+    {
+        $memberId = md5(strtolower($email));
+        $this->call('post', "/lists/{$listId}/members/{$memberId}/actions/delete-permanent");
+    }
+
     // HTTP -------------------------------------------------------------------
 
     public function call(string $method, string $endpoint, array $data = []): array
     {
-        $method = strtolower($method);
+        $method = trim(strtolower($method));
         if (!in_array($method, ['get', 'put', 'post', 'delete', 'patch'])) {
             throw new MailchimpException('Invalid API call method: ' . $method);
         }
-        if (in_array($method, ['get', 'delete'])) {
-            $url = $this->baseurl . $endpoint;
-            $url .= $data ? '?' . http_build_query($data) : '';
-            $response = Requests::$method($url, $this->headers(), $this->options());
-        } else {
-            $response = Requests::$method(
-                $this->baseurl . $endpoint,
-                $this->headers(),
-                json_encode($data),
-                $this->options()
-            );
+        $url = $this->baseurl . $endpoint;
+        switch ($method) {
+            case 'get':
+            case 'delete':
+                $url .= $data ? '?' . http_build_query($data) : '';
+                $response = (new Http())->withBasicAuth('mcuser', $this->apikey)->$method($url);
+                break;
+            default:
+                $response = (new Http())->withBasicAuth('mcuser', $this->apikey)->$method($url, $data);
         }
-        $this->responseCode = intval($response->status_code);
+        /** @var HttpResponse $response */
+        $this->responseCode = $response->status();
         if ($this->responseCode >= 400) {
             $this->apiError($response);
         }
-        return json_decode($response->body, true) ?? [];
+        return $response->json();
     }
 
-    protected function options(): array
+    protected function apiError(HttpResponse $response)
     {
-        return [
-            'auth' => new Requests_Auth_Basic(['mcuser', $this->apikey]),
-        ];
-    }
-
-    protected function headers(): array
-    {
-        return [];
-    }
-
-    protected function apiError(Requests_Response $response)
-    {
-        $info = var_export(json_decode($response->body, true), true);
-        $message = "Mailchimp API error (" . $response->status_code . "): " . $info;
+        $info = var_export($response->json(), true);
+        $message = "Mailchimp API error (" . $response->status() . "): " . $info;
         if ($this->responseCode <= 499) {
-            throw new MailchimpBadRequestException($message, $this->responseCode, null, $response->body);
+            throw new MailchimpBadRequestException($message, $this->responseCode, null, $response->body());
         }
         throw new MailchimpInternalErrorException($message, $this->responseCode);
     }
