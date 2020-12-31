@@ -84,14 +84,11 @@ class MailchimpApi
             throw new MailchimpException('Invalid API call method: ' . $method);
         }
         $url = $this->baseurl . $endpoint;
-        switch ($method) {
-            case 'get':
-            case 'delete':
-                $url .= $data ? '?' . http_build_query($data) : '';
-                $response = (new Http())->withBasicAuth('mcuser', $this->apikey)->$method($url);
-                break;
-            default:
-                $response = (new Http())->withBasicAuth('mcuser', $this->apikey)->$method($url, $data);
+        if (in_array($method, ['get', 'delete'])) {
+            $url .= $data ? '?' . http_build_query($data) : '';
+            $response = (new Http())->withBasicAuth('mcuser', $this->apikey)->$method($url);
+        } else {
+            $response = (new Http())->withBasicAuth('mcuser', $this->apikey)->$method($url, $data);
         }
         /** @var HttpResponse $response */
         $this->responseCode = $response->status();

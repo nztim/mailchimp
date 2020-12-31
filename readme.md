@@ -86,7 +86,7 @@ Mailchimp::addUpdateMember('listid', $member);
 ### Upgrading
 - To v4.0:
     - PHP 7.4 | 8.0 is now required
-    - Use archive/delete in place of unsubscribe in order to prevent reaching the free limit.  
+    - Use unsub with archive in order to maximise the use of free accounts.
 - To v3.0:
     - Exceptions are now thrown for all errors, use try/catch where necessary
     - Double-opt-in is now the default, update `Mailchimp::subscribe()` as required
