@@ -3,8 +3,8 @@
 use NZTim\Mailchimp\Exception\MailchimpBadRequestException;
 use NZTim\Mailchimp\Exception\MailchimpException;
 use NZTim\Mailchimp\Exception\MailchimpInternalErrorException;
-use NZTim\SimpleHttp\Http;
-use NZTim\SimpleHttp\HttpResponse;
+use NZTim\Mailchimp\Http\Http;
+use NZTim\Mailchimp\Http\HttpResponse;
 
 class MailchimpApi
 {
