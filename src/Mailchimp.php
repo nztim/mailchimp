@@ -25,8 +25,8 @@ class Mailchimp
         return $results['lists'] ?? [];
     }
 
-     // Determines the status of a subscriber
-     // Possible responses: 'subscribed', 'unsubscribed', 'cleaned', 'pending', 'transactional' or 'not found'
+    // Determines the status of a subscriber
+    // Possible responses:  "subscribed", "unsubscribed", "cleaned", "pending", "transactional", "archived" or "not found".
     public function status(string $listId, string $email): string
     {
         $this->checkListExists($listId);
@@ -49,7 +49,7 @@ class Mailchimp
     public function check(string $listId, string $email): bool
     {
         $result = $this->status($listId, $email);
-        return in_array($result, ['subscribed',  'pending']);
+        return in_array($result, ['subscribed', 'pending']);
     }
 
     // Add a member to the list or update an existing member
@@ -101,7 +101,7 @@ class Mailchimp
             $this->api->getList($listId);
         } catch (Throwable $e) {
             if ($this->api->responseCodeNotFound()) {
-                throw new MailchimpBadRequestException('Mailchimp API error: list id:'.$listId.' does not exist');
+                throw new MailchimpBadRequestException('Mailchimp API error: list id:' . $listId . ' does not exist');
             }
             throw $e;
         }
@@ -112,6 +112,6 @@ class Mailchimp
         if (!isset($member['status'])) {
             return false;
         }
-        return in_array($member['status'], ['subscribed', 'unsubscribed', 'cleaned', 'pending', 'transactional','archived']);
+        return in_array($member['status'], ['subscribed', 'unsubscribed', 'cleaned', 'pending', 'transactional', 'archived']);
     }
 }

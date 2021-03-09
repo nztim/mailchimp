@@ -44,6 +44,7 @@ Mailchimp::archive($listId, $emailAddress);
 
 // Permanently delete a member record:
 Mailchimp::delete($listId, $emailAddress);
+// Use with care: deleted members cannot be re-added without the user subscribing via a Mailchimp-hosted form with double-opt-in confirmation.
 
 // Directly call the API:
 Mailchimp::api($method, $endpoint, $data = []); // Returns an array.
