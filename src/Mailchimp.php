@@ -49,7 +49,7 @@ class Mailchimp
     public function check(string $listId, string $email): bool
     {
         $result = $this->status($listId, $email);
-        return in_array($result, ['subscribed', 'pending']);
+        return $result === 'subscribed';
     }
 
     // Add a member to the list or update an existing member

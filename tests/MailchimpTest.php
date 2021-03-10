@@ -101,6 +101,14 @@ class MailchimpTest extends MockeryTestCase
     }
 
     /** @test */
+    public function check_pending()
+    {
+        $this->api->shouldReceive('getList')->with(self::LISTID)->andReturn([]);
+        $this->api->shouldReceive('getMember')->andReturn(['status' => 'pending']);
+        $this->assertFalse($this->mc->check(self::LISTID, 'user@example.com'));
+    }
+
+    /** @test */
     public function check_not_subscribed()
     {
         $this->api->shouldReceive('getList')->with(self::LISTID)->andReturn([]);
