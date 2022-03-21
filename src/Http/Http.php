@@ -121,12 +121,13 @@ class Http
         }
     }
 
+    // Parse URL query string and turn it into an array
     private function mergeUrlQuery(string $url)
     {
-        // Parse URL query string and turn it into an array
-        parse_str(parse_url($url, PHP_URL_QUERY), $query);
-        if ($query) {
-            $this->options['query'] = array_merge($this->options['query'], $query);
+        $query = parse_url($url, PHP_URL_QUERY);
+        if (is_string($query)) {
+            parse_str($query, $queryArray);
+            $this->options['query'] = array_merge($this->options['query'], $queryArray);
         }
     }
 }
