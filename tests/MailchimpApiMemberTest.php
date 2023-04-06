@@ -53,7 +53,7 @@ class MailchimpApiMemberTest extends TestCase
     }
 
     /** @test */
-    public function status()
+    public function member_status()
     {
         $member = (new Member($this->email()));
         $this->api->addUpdateMember($this->listId, $member);

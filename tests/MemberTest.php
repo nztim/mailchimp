@@ -44,7 +44,7 @@ class MemberTest extends TestCase
     }
 
     /** @test */
-    public function status()
+    public function member_status()
     {
         $member = (new Member($this->email))->status('cleaned');
         $this->assertEquals('cleaned', $member->parameters()['status']);
