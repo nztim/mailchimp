@@ -5,13 +5,8 @@ use Illuminate\Support\ServiceProvider;
 
 class MailchimpServiceProvider extends ServiceProvider
 {
-    protected $defer = false;
-
     public function boot()
     {
-        $this->app->bind(Mailchimp::class, function () {
-            return new Mailchimp(config('mailchimp.apikey'));
-        });
         $this->publishes([
             __DIR__.'/../config/mailchimp.php' => config_path('mailchimp.php'),
         ]);
@@ -19,6 +14,9 @@ class MailchimpServiceProvider extends ServiceProvider
 
     public function register()
     {
+        $this->app->bind(Mailchimp::class, function () {
+            return new Mailchimp(config('mailchimp.apikey'));
+        });
         $this->app->bind('mailchimp', function () {
             return $this->app->make(Mailchimp::class);
         });

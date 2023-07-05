@@ -62,12 +62,12 @@ As with the `subscribe()` method, double-opt-in is default but existing members 
 ### Errors
 
 - Exceptions are thrown for all errors.
-- Networking/communications errors will usually be of the type `Requests_Exception`.
+- Networking/communications errors will usually be of the type `ConnectionException`.
 - API errors will be of the base type `NZTim\Mailchimp\MailchimpException`, e.g. incorrect API key, list does not exist.
-- `NZTim\Mailchimp\Exception\MailchimpBadRequestException` includes a `response()` method that returns the response body as an array.
-- Gotchas: the API throws an error when you:
-    - Specify a merge field name with incorrect capitalisation
-    - Omit a required merge field when adding a new member
+- `NZTim\Mailchimp\Exception\MailchimpBadRequestException` includes a `response()` method that attempts to provide the response body as an array, for automated handling of some error types.
+- Gotchas: 
+    - If you receive an error adding a new subscriber, check for required merge fields.
+    - Merge fields are case-sensitive.
 
 ### Examples
 

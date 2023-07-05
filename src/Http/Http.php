@@ -7,10 +7,8 @@ use GuzzleHttp\Exception\ConnectException;
 
 class Http
 {
-    /** @var string */
-    private $bodyFormat;
-    /** @var array */
-    private $options;
+    private string $bodyFormat;
+    private array $options;
 
     public function __construct()
     {
