@@ -38,10 +38,9 @@ class MailchimpApi
 
     public function addUpdate(string $listId, string $email, array $merge, bool $confirm): void
     {
-        $email = strtolower($email);
-        $memberId = md5($email);
+        $member = new Member($email);
         $data = [
-            'email_address' => $email,
+            'email_address' => $member->email(),
             'status_if_new' => $confirm ? 'pending' : 'subscribed',
             'status'        => $confirm ? 'pending' : 'subscribed',
         ];
@@ -49,7 +48,7 @@ class MailchimpApi
         if ($merge) {
             $data['merge_fields'] = $merge;
         }
-        $this->call('put', "/lists/{$listId}/members/{$memberId}", $data);
+        $this->call('put', "/lists/{$listId}/members/{$member->hash()}", $data);
     }
 
     public function addUpdateMember(string $listId, Member $member): void
@@ -59,19 +58,19 @@ class MailchimpApi
 
     public function unsubscribe(string $listId, string $email): void
     {
-        $memberId = md5(strtolower($email));
+        $memberId = (new Member($email))->hash();
         $this->call('put', "/lists/{$listId}/members/{$memberId}", ['email_address' => $email, 'status_if_new' => 'unsubscribed', 'status' => 'unsubscribed']);
     }
 
     public function archive(string $listId, string $email): void
     {
-        $memberId = md5(strtolower($email));
+        $memberId = (new Member($email))->hash();
         $this->call('delete', "/lists/{$listId}/members/{$memberId}", ['email_address' => $email]);
     }
 
     public function delete(string $listId, string $email): void
     {
-        $memberId = md5(strtolower($email));
+        $memberId = (new Member($email))->hash();
         $this->call('post', "/lists/{$listId}/members/{$memberId}/actions/delete-permanent");
     }
 

@@ -3,6 +3,7 @@
 use NZTim\Mailchimp\Exception\MailchimpBadRequestException;
 use NZTim\Mailchimp\Exception\MailchimpException;
 use NZTim\Mailchimp\MailchimpApi;
+use NZTim\Mailchimp\Member;
 use PHPUnit\Framework\TestCase;
 
 class MailchimpApiTest extends TestCase
@@ -31,10 +32,9 @@ class MailchimpApiTest extends TestCase
     }
 
     /** @test */
-    public function getList()
+    public function get_list()
     {
         $list = $this->api->getList($this->listId);
-        $this->assertTrue(is_array($list));
         $this->assertEquals($this->listId, $list['id']);
     }
 
@@ -66,7 +66,7 @@ class MailchimpApiTest extends TestCase
     }
 
     /** @test */
-    public function getNonexistentList()
+    public function get_nonexistent_list()
     {
         try {
             $this->api->getList('invalid');
@@ -79,11 +79,12 @@ class MailchimpApiTest extends TestCase
     }
 
     /** @test */
-    public function getMemberSuccess()
+    public function get_member_success()
     {
         $email = $this->email();
+        $hash = (new Member($email))->hash();
         $this->api->addUpdate($this->listId, $email, [], false);
-        $member = $this->api->getMember($this->listId, md5($email));
+        $member = $this->api->getMember($this->listId, $hash);
         $this->assertEquals('subscribed', $member['status']);
         $this->assertEquals($email, $member['email_address']);
         //
@@ -91,7 +92,7 @@ class MailchimpApiTest extends TestCase
     }
 
     /** @test */
-    public function getMemberNotFound()
+    public function get_member_not_found()
     {
         try {
             $this->api->getMember($this->listId, md5(uniqid()));
@@ -106,7 +107,7 @@ class MailchimpApiTest extends TestCase
     }
 
     /** @test */
-    public function addUpdateListDoesntExist()
+    public function add_update_list_doesnt_exist()
     {
         try {
             $this->api->addUpdate('non-existent-list', $this->email(), [], false);
@@ -119,13 +120,13 @@ class MailchimpApiTest extends TestCase
     }
 
     /** @test */
-    public function addUpdateNewMemberSuccess()
+    public function add_update_new_member_success()
     {
         $email = $this->email();
-        $id = md5($email);
+        $hash = (new Member($email))->hash();
         $this->api->addUpdate($this->listId, $email, ['FNAME' => 'First name', 'LNAME' => 'Last name'], false);
-        $member = $this->api->getMember($this->listId, $id);
-        $this->assertEquals($id, $member['id']);
+        $member = $this->api->getMember($this->listId, $hash);
+        $this->assertEquals($hash, $member['id']);
         $this->assertEquals('First name', $member['merge_fields']['FNAME']);
         $this->assertEquals('Last name', $member['merge_fields']['LNAME']);
         $this->assertEquals('subscribed', $member['status']);
@@ -134,37 +135,96 @@ class MailchimpApiTest extends TestCase
     }
 
     /** @test */
-    public function addUpdateExistingMemberSuccess()
+    public function add_update_existing_member_success()
     {
         $email = $this->email();
-        $id = md5($email);
+        $hash = (new Member($email))->hash();
         $fname = uniqid();
         $this->api->addUpdate($this->listId, $email, ['FNAME' => $fname], false);
-        $member = $this->api->getMember($this->listId, $id);
+        $member = $this->api->getMember($this->listId, $hash);
         $this->assertEquals($fname, $member['merge_fields']['FNAME']);
         //
         $this->unsub($email);
     }
 
     /** @test */
-    public function addUpdateNewMemberConfirmation()
+    public function add_update_existing_member_email_is_lowercased_and_trimmed()
     {
-        $this->markTestSkipped();
-        $this->api->addUpdate($this->listId, $this->email(), ['FNAME' => 'First name', 'LNAME' => 'Last name'], true);
-        // Check email comes through!
+        $email = $this->emailWithUppercaseAndSpaces();
+        // Create a new member
+        $member = new Member($email);
+        $fname = uniqid();
+        $this->api->addUpdate($this->listId, $member->email(), ['FNAME' => $fname], false);
+        $memberDetails = $this->api->getMember($this->listId, $member->hash());
+        $this->assertEquals($fname, $memberDetails['merge_fields']['FNAME']);
+        // Update existing member without normalising the email address
+        $fname2 = uniqid();
+        $this->api->addUpdate($this->listId, $email, ['FNAME' => $fname2], false); // <-- Here original $email is used
+        $memberDetails = $this->api->getMember($this->listId, $member->hash());
+        $this->assertEquals($fname2, $memberDetails['merge_fields']['FNAME']);
     }
 
     /** @test */
-    public function unsubscribe()
+    public function add_update_new_member_confirmation()
+    {
+        $this->markTestSkipped("This tests that the confirmation email is sent");
+        $this->api->addUpdate($this->listId, $this->email(), ['FNAME' => 'First name', 'LNAME' => 'Last name'], true);
+    }
+
+    /** @test */
+    public function unsubscribe_success()
     {
         $email = $this->email();
-        $id = md5($email);
-        $this->api->addUpdate($this->listId, $email, ['FNAME' => 'First name', 'LNAME' => 'Last name'], false);
-        $member = $this->api->getMember($this->listId, $id);
-        $this->assertEquals('subscribed', $member['status']);
+        $this->subscriberUserAndConfirm($email);
+        //
         $this->api->unsubscribe($this->listId, $email);
-        $member = $this->api->getMember($this->listId, $id);
+        $member = $this->api->getMember($this->listId, (new Member($email))->hash());
         $this->assertEquals('unsubscribed', $member['status']);
+    }
+
+    /** @test */
+    public function unsubscribe_success_with_uppercase_and_spaces()
+    {
+        $email = $this->emailWithUppercaseAndSpaces();
+        $this->subscriberUserAndConfirm($email);
+        // Now unsubscribe using the original $email, ensure it is processed before use with the api.
+        $this->api->unsubscribe($this->listId, $email);
+        $member = $this->api->getMember($this->listId, (new Member($email))->hash());
+        $this->assertEquals('unsubscribed', $member['status']);
+    }
+
+    /** @test */
+    public function archive_with_uppercase_and_spaces()
+    {
+        $email = $this->emailWithUppercaseAndSpaces();
+        $this->subscriberUserAndConfirm($email);
+        // Now unsub & archive using the original $email, ensure it is processed before use with the api.
+        $this->api->unsubscribe($this->listId, $email);
+        $this->api->archive($this->listId, $email);
+        $member = $this->api->getMember($this->listId, (new Member($email))->hash());
+        $this->assertEquals('archived', $member['status']);
+    }
+
+    /** @test */
+    public function delete_with_uppercase_and_spaces()
+    {
+        $email = $this->emailWithUppercaseAndSpaces();
+        $this->subscriberUserAndConfirm($email);
+        // Now unsub, archive and delete using the original $email, ensure it is processed before use with the api.
+        $this->api->unsubscribe($this->listId, $email);
+        $this->api->archive($this->listId, $email);
+        $this->api->delete($this->listId, $email);
+        // Now try and find
+        try {
+            $this->api->getMember($this->listId, (new Member($email))->hash());
+        } catch (MailchimpBadRequestException $e) {
+            $this->assertEquals(404, $this->api->responseCode());
+            $this->assertTrue($this->api->responseCodeNotFound());
+            $this->assertEquals(404, $e->getCode());
+            $this->assertEquals(404, $e->response()['status']);
+            return;
+        }
+        $this->fail('Exception not thrown');
     }
 
     /** @test */
@@ -194,6 +254,19 @@ class MailchimpApiTest extends TestCase
     private function email(): string
     {
         return strtolower(uniqid(bin2hex(random_bytes(2)))) . '@' . $this->domain;
+    }
+
+    private function emailWithUppercaseAndSpaces(): string
+    {
+        return "  UserName" . rand(1000, 99999) . '@' . $this->domain;
+    }
+
+    private function subscriberUserAndConfirm(string $email): void
+    {
+        $hash = (new Member($email))->hash();
+        $this->api->addUpdate($this->listId, $email, ['FNAME' => 'First name', 'LNAME' => 'Last name'], false);
+        $member = $this->api->getMember($this->listId, $hash);
+        $this->assertEquals('subscribed', $member['status']);
     }
 
     private function unsub(string $email): void

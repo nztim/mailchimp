@@ -287,4 +287,20 @@ class MailchimpTest extends TestCase
         $this->mc->addUpdateMember(static::LISTID, $member);
         $this->assertEquals('subscribed', $member->parameters()['status']);
     }
+
+    /** @test */
+    public function status_method_lowercases_and_trims_email_addresses()
+    {
+        $email = '   TEST@example.com ';
+        $trimmedLowercasedEmail = trim(strtolower($email));
+        $correctSubscriberHash = md5($trimmedLowercasedEmail);
+        $this->api->expects($this->once())
+            ->method('getList')
+            ->with(static::LISTID);
+        $this->api->expects($this->once())
+            ->method('getMember')
+            ->with(static::LISTID, $correctSubscriberHash)
+            ->willReturn(['status' => 'subscribed']);
+        $this->assertEquals('subscribed', $this->mc->status(static::LISTID, $email));
+    }
 }

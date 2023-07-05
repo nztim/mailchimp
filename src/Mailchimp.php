@@ -30,7 +30,7 @@ class Mailchimp
     public function status(string $listId, string $email): string
     {
         $this->checkListExists($listId);
-        $memberId = md5(strtolower($email));
+        $memberId = (new Member($email))->hash();
         try {
             $member = $this->api->getMember($listId, $memberId);
         } catch (Throwable $e) {
