@@ -6,7 +6,7 @@ use Throwable;
 
 class Mailchimp
 {
-    protected $api;
+    protected MailchimpApi $api;
 
     public function __construct($apikey, $api = null)
     {
@@ -54,7 +54,7 @@ class Mailchimp
 
     // Add a member to the list or update an existing member
     // Ensures that existing subscribers are not asked to reconfirm
-    public function subscribe(string $listId, string $email, array $mergeFields = [], bool $confirm = true)
+    public function subscribe(string $listId, string $email, array $mergeFields = [], bool $confirm = true): void
     {
         if ($this->status($listId, $email) == 'subscribed') {
             $confirm = false;
@@ -62,7 +62,7 @@ class Mailchimp
         $this->api->addUpdate($listId, $email, $mergeFields, $confirm);
     }
 
-    public function addUpdateMember(string $listId, Member $member)
+    public function addUpdateMember(string $listId, Member $member): void
     {
         if ($this->status($listId, $member->parameters()['email_address']) == 'subscribed') {
             $member->confirm(false);
@@ -70,7 +70,7 @@ class Mailchimp
         $this->api->addUpdateMember($listId, $member);
     }
 
-    public function unsubscribe(string $listId, string $email)
+    public function unsubscribe(string $listId, string $email): void
     {
         if (!$this->check($listId, $email)) {
             return;
@@ -78,12 +78,12 @@ class Mailchimp
         $this->api->unsubscribe($listId, $email);
     }
 
-    public function archive(string $listId, string $email)
+    public function archive(string $listId, string $email): void
     {
         $this->api->archive($listId, $email);
     }
 
-    public function delete(string $listId, string $email)
+    public function delete(string $listId, string $email): void
     {
         $this->api->delete($listId, $email);
     }
@@ -95,7 +95,7 @@ class Mailchimp
         return $this->api->call($method, $endpoint, $data);
     }
 
-    protected function checkListExists(string $listId)
+    protected function checkListExists(string $listId): void
     {
         try {
             $this->api->getList($listId);

@@ -1,4 +1,6 @@
 /vendor
 composer.lock
 pu.bat
+puf.bat
 secrets.php
+test.php

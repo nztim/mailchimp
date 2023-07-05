@@ -8,9 +8,9 @@ use NZTim\Mailchimp\Http\HttpResponse;
 
 class MailchimpApi
 {
-    protected $apikey;
-    protected $baseurl = 'https://<dc>.api.mailchimp.com/3.0';
-    protected $responseCode;
+    protected string $apikey;
+    protected string $baseurl = 'https://<dc>.api.mailchimp.com/3.0';
+    protected int $responseCode;
 
     public function __construct(string $apikey)
     {
@@ -36,7 +36,7 @@ class MailchimpApi
         return $this->call('get', "/lists/{$listId}/members/{$memberId}");
     }
 
-    public function addUpdate(string $listId, string $email, array $merge, bool $confirm)
+    public function addUpdate(string $listId, string $email, array $merge, bool $confirm): void
     {
         $email = strtolower($email);
         $memberId = md5($email);
@@ -52,24 +52,24 @@ class MailchimpApi
         $this->call('put', "/lists/{$listId}/members/{$memberId}", $data);
     }
 
-    public function addUpdateMember(string $listId, Member $member)
+    public function addUpdateMember(string $listId, Member $member): void
     {
         $this->call('put', "/lists/{$listId}/members/{$member->hash()}", $member->parameters());
     }
 
-    public function unsubscribe(string $listId, string $email)
+    public function unsubscribe(string $listId, string $email): void
     {
         $memberId = md5(strtolower($email));
         $this->call('put', "/lists/{$listId}/members/{$memberId}", ['email_address' => $email, 'status_if_new' => 'unsubscribed', 'status' => 'unsubscribed']);
     }
 
-    public function archive(string $listId, string $email)
+    public function archive(string $listId, string $email): void
     {
         $memberId = md5(strtolower($email));
         $this->call('delete', "/lists/{$listId}/members/{$memberId}", ['email_address' => $email]);
     }
 
-    public function delete(string $listId, string $email)
+    public function delete(string $listId, string $email): void
     {
         $memberId = md5(strtolower($email));
         $this->call('post', "/lists/{$listId}/members/{$memberId}/actions/delete-permanent");
@@ -98,7 +98,7 @@ class MailchimpApi
         return $response->json();
     }
 
-    protected function apiError(HttpResponse $response)
+    protected function apiError(HttpResponse $response): void
     {
         $info = var_export($response->json(), true);
         $message = "Mailchimp API error (" . $response->status() . "): " . $info;

@@ -150,7 +150,7 @@ class MailchimpApiTest extends TestCase
     public function addUpdateNewMemberConfirmation()
     {
         $this->markTestSkipped();
-        $this->api->addUpdate($this->listId,$this->email(), ['FNAME' => 'First name', 'LNAME' => 'Last name'], true);
+        $this->api->addUpdate($this->listId, $this->email(), ['FNAME' => 'First name', 'LNAME' => 'Last name'], true);
         // Check email comes through!
     }
 
