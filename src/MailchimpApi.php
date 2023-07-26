@@ -56,6 +56,11 @@ class MailchimpApi
         $this->call('put', "/lists/{$listId}/members/{$member->hash()}", $member->parameters());
     }
 
+    public function addUpdateMemberSkipMergeValidation(string $listId, Member $member): void
+    {
+        $this->call('put', "/lists/{$listId}/members/{$member->hash()}?skip_merge_validation=true", $member->parameters());
+    }
+
     public function unsubscribe(string $listId, string $email): void
     {
         $memberId = (new Member($email))->hash();

@@ -53,8 +53,11 @@ Mailchimp::api($method, $endpoint, $data = []); // Returns an array.
 For access to all the member properties available in the v3 API, use the Member class to subscribe and update list members:
 
 ```php
-$member = (new NZTim\Mailchimp\Member($email))->merge_fields(['FNAME' => 'First name'])->email_type('text')->confirm(false);
-Mailchimp::addUpdateMember($member);
+$member = (new NZTim\Mailchimp\Member($email))
+    ->merge_fields(['FNAME' => 'First name'])
+    ->email_type('text')
+    ->confirm(false);
+Mailchimp::addUpdateMember($listId, $member);
 ```
 
 As with the `subscribe()` method, double-opt-in is default but existing members will not be asked to re-verify so you can use the same methods for create and update without needing to check.
@@ -65,9 +68,10 @@ As with the `subscribe()` method, double-opt-in is default but existing members 
 - Networking/communications errors will usually be of the type `ConnectionException`.
 - API errors will be of the base type `NZTim\Mailchimp\MailchimpException`, e.g. incorrect API key, list does not exist.
 - `NZTim\Mailchimp\Exception\MailchimpBadRequestException` includes a `response()` method that attempts to provide the response body as an array, for automated handling of some error types.
-- Gotchas: 
+- Gotchas with merge fields: 
     - If you receive an error adding a new subscriber, check for required merge fields.
     - Merge fields are case-sensitive.
+    - `Mailchimp::addUpdateMemberSkipMergeValidation()` is available if needed.  
 
 ### Examples
 

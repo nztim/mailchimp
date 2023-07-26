@@ -56,7 +56,7 @@ class Mailchimp
     // Ensures that existing subscribers are not asked to reconfirm
     public function subscribe(string $listId, string $email, array $mergeFields = [], bool $confirm = true): void
     {
-        if ($this->status($listId, $email) == 'subscribed') {
+        if ($this->status($listId, $email) === 'subscribed') {
             $confirm = false;
         }
         $this->api->addUpdate($listId, $email, $mergeFields, $confirm);
@@ -64,10 +64,18 @@ class Mailchimp
 
     public function addUpdateMember(string $listId, Member $member): void
     {
-        if ($this->status($listId, $member->parameters()['email_address']) == 'subscribed') {
+        if ($this->status($listId, $member->parameters()['email_address']) === 'subscribed') {
             $member->confirm(false);
         }
         $this->api->addUpdateMember($listId, $member);
+    }
+
+    public function addUpdateMemberSkipMergeValidation(string $listId, Member $member): void
+    {
+        if ($this->status($listId, $member->parameters()['email_address']) === 'subscribed') {
+            $member->confirm(false);
+        }
+        $this->api->addUpdateMemberSkipMergeValidation($listId, $member);
     }
 
     public function unsubscribe(string $listId, string $email): void
