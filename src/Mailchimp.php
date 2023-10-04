@@ -62,6 +62,12 @@ class Mailchimp
         $this->api->addUpdate($listId, $email, $mergeFields, $confirm);
     }
 
+    // Add tags to member in list
+    public function addTags(string $listId, string $email, array $tags)
+    {
+        $this->api->addTags($listId, $email, $tags);
+    }
+
     public function addUpdateMember(string $listId, Member $member): void
     {
         if ($this->status($listId, $member->parameters()['email_address']) === 'subscribed') {
