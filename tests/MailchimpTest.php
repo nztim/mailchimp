@@ -303,4 +303,36 @@ class MailchimpTest extends TestCase
             ->willReturn(['status' => 'subscribed']);
         $this->assertEquals('subscribed', $this->mc->status(static::LISTID, $email));
     }
+
+    /** @test */
+    public function add_tags_success()
+    {
+        $email = 'test@example.com';
+        $tags = ['a', 'b', 'c'];
+        $this->api->expects($this->once())
+            ->method('addTags')
+            ->with(static::LISTID, $email, $tags);
+        $this->mc->addTags(static::LISTID, $email, $tags);
+    }
+
+    /** @test */
+    public function add_tags_skips_non_strings()
+    {
+        $email = 'test@example.com';
+        $tags = [1, 2, 'c'];
+        $this->api->expects($this->once())
+            ->method('addTags')
+            ->with(static::LISTID, $email, ['c']);
+        $this->mc->addTags(static::LISTID, $email, $tags);
+    }
+
+    /** @test */
+    public function add_tags_does_not_call_api_if_list_is_empty()
+    {
+        $email = 'test@example.com';
+        $tags = [1, 2, 3];
+        $this->api->expects($this->never())
+            ->method('addTags');
+        $this->mc->addTags(static::LISTID, $email, $tags);
+    }
 }

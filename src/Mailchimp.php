@@ -96,6 +96,16 @@ class Mailchimp
         $this->api->delete($listId, $email);
     }
 
+    public function addTags(string $listId, string $email, array $tags): void
+    {
+        $tags = array_values(array_filter($tags, function ($value) {
+            return is_string($value);
+        }));
+        if ($tags) {
+            $this->api->addTags($listId, $email, $tags);
+        }
+    }
+
     // Make an API call directly
     public function api(string $method, string $endpoint, array $data = []): array
     {

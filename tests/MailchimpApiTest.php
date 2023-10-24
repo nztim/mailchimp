@@ -251,6 +251,46 @@ class MailchimpApiTest extends TestCase
         }
     }
 
+    /** @test */
+    public function add_tags()
+    {
+        $tags = ['tag1', 'tag2', 'tag3'];
+        $email = $this->email();
+        $this->subscriberUserAndConfirm($email);
+        $this->api->addTags($this->listId, $email, $tags);
+        //
+        $hash = (new Member($email))->hash();
+        $response = $this->api->call('get', "/lists/{$this->listId}/members/{$hash}/tags");
+        $assignedTags = [];
+        foreach ($response['tags'] ?? [] as $element) {
+            $assignedTags[] = $element['name'] ?? '';
+        }
+        foreach ($tags as $tag) {
+            $this->assertTrue(in_array($tag, $assignedTags));
+        }
+        //
+        $this->unsub($email);
+    }
+
+    /** @test */
+    public function cannot_remove_tags_using_add_tags()
+    {
+        $tags = ['tag1'];
+        $email = $this->email();
+        $this->subscriberUserAndConfirm($email);
+        $this->api->addTags($this->listId, $email, $tags);
+        //
+        $hash = (new Member($email))->hash();
+        $response = $this->api->call('get', "/lists/{$this->listId}/members/{$hash}/tags");
+        $this->assertTrue($response['tags'][0]['name'] === 'tag1');
+        //
+        $this->api->addTags($this->listId, $email, []); // Add empty list of tags
+        $response = $this->api->call('get', "/lists/{$this->listId}/members/{$hash}/tags");
+        $this->assertTrue($response['tags'][0]['name'] === 'tag1'); // Previously added tag is still present
+        //
+        $this->unsub($email);
+    }
+
     private function email(): string
     {
         return strtolower(uniqid(bin2hex(random_bytes(2)))) . '@' . $this->domain;
