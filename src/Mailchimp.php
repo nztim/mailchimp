@@ -62,12 +62,6 @@ class Mailchimp
         $this->api->addUpdate($listId, $email, $mergeFields, $confirm);
     }
 
-    // Add tags to member in list
-    public function addTags(string $listId, string $email, array $tags)
-    {
-        $this->api->addTags($listId, $email, $tags);
-    }
-
     public function addUpdateMember(string $listId, Member $member): void
     {
         if ($this->status($listId, $member->parameters()['email_address']) === 'subscribed') {
@@ -100,6 +94,16 @@ class Mailchimp
     public function delete(string $listId, string $email): void
     {
         $this->api->delete($listId, $email);
+    }
+
+    public function addTags(string $listId, string $email, array $tags): void
+    {
+        $tags = array_values(array_filter($tags, function ($value) {
+            return is_string($value);
+        }));
+        if ($tags) {
+            $this->api->addTags($listId, $email, $tags);
+        }
     }
 
     // Make an API call directly

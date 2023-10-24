@@ -51,19 +51,6 @@ class MailchimpApi
         $this->call('put', "/lists/{$listId}/members/{$member->hash()}", $data);
     }
 
-    public function addTags(string $listId, string $email, array $tags)
-    {
-        $email = strtolower($email);
-        $memberId = md5($email);
-        $data = [
-            'tags' => array_map(function($tag) {
-                return ["name" => $tag, "status" => "active"];
-            }, $tags)
-        ];
-
-        $this->call('post', "/lists/{$listId}/members/{$memberId}/tags", $data);
-    }
-
     public function addUpdateMember(string $listId, Member $member): void
     {
         $this->call('put', "/lists/{$listId}/members/{$member->hash()}", $member->parameters());
@@ -90,6 +77,19 @@ class MailchimpApi
     {
         $memberId = (new Member($email))->hash();
         $this->call('post', "/lists/{$listId}/members/{$memberId}/actions/delete-permanent");
+    }
+
+    public function addTags(string $listId, string $email, array $tags): void
+    {
+        $email = strtolower($email);
+        $memberId = md5($email);
+        $data = [
+            'tags' => array_map(function($tag) {
+                return ["name" => $tag, "status" => "active"];
+            }, $tags)
+        ];
+
+        $this->call('post', "/lists/{$listId}/members/{$memberId}/tags", $data);
     }
 
     // HTTP -------------------------------------------------------------------

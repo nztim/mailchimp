@@ -31,6 +31,9 @@ Mailchimp::check($listId, $emailAddress); // Returns boolean
 // Check the staus of a subscriber:
 Mailchimp::status($listId, $emailAddress); // Returns 'subscribed', 'unsubscribed', 'cleaned', 'pending', 'transactional' or 'not found'
 
+// Add tags to a subscriber
+Mailchimp::addTags($listId, $emailAddress, $tags); 
+
 // Adds/updates an existing subscriber:
 Mailchimp::subscribe($listId, $emailAddress, $merge = [], $confirm = true);
 // Use $confirm = false to skip double-opt-in if you already have permission.
