@@ -291,6 +291,39 @@ class MailchimpApiTest extends TestCase
         $this->unsub($email);
     }
 
+    /** @test */
+    public function get_tags()
+    {
+        $tags = ['tag1', 'tag2', 'tag3'];
+        $email = $this->email();
+        $this->subscriberUserAndConfirm($email);
+        $this->api->addTags($this->listId, $email, $tags);
+        //
+        $response = $this->api->getTags($this->listId, $email);
+        $foundTags = [];
+        foreach ($response['tags'] ?? [] as $data) {
+            $foundTags[] = $data['name'];
+        }
+        $this->assertEquals([], array_diff($tags, $foundTags));
+    }
+
+    /** @test */
+    public function remove_tags()
+    {
+        $tags = ['tag1', 'tag2', 'tag3'];
+        $email = $this->email();
+        $this->subscriberUserAndConfirm($email);
+        $this->api->addTags($this->listId, $email, $tags);
+        //
+        $this->api->removeTags($this->listId, $email, ['tag2', 'tag3']);
+        $response = $this->api->getTags($this->listId, $email);
+        $foundTags = [];
+        foreach ($response['tags'] ?? [] as $data) {
+            $foundTags[] = $data['name'];
+        }
+        $this->assertEquals([], array_diff(['tag1'], $foundTags));
+    }
+
     private function email(): string
     {
         return strtolower(uniqid(bin2hex(random_bytes(2)))) . '@' . $this->domain;

@@ -31,8 +31,17 @@ Mailchimp::check($listId, $emailAddress); // Returns boolean
 // Check the staus of a subscriber:
 Mailchimp::status($listId, $emailAddress); // Returns 'subscribed', 'unsubscribed', 'cleaned', 'pending', 'transactional' or 'not found'
 
+// Get subscriber tags:
+Mailchimp::getTags($listId, $emailAddress); // Returns array of Tag objects
+
 // Add tags to a subscriber
-Mailchimp::addTags($listId, $emailAddress, $tags); 
+Mailchimp::addTags($listId, $emailAddress, $tags); // $tags = ['tag1', 'tag2']
+
+// Remove tags from a subscriber
+Mailchimp::removeTags($listId, $emailAddress, $tags); // $tags = ['tag1', 'tag2']
+
+// Remove all tags from a subscriber
+Mailchimp::removeAllTags($listId, $emailAddress); 
 
 // Adds/updates an existing subscriber:
 Mailchimp::subscribe($listId, $emailAddress, $merge = [], $confirm = true);

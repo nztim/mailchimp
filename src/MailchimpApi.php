@@ -79,6 +79,13 @@ class MailchimpApi
         $this->call('post', "/lists/{$listId}/members/{$memberId}/actions/delete-permanent");
     }
 
+    public function getTags(string $listId, string $email): array
+    {
+        $email = strtolower($email);
+        $memberId = md5($email);
+        return $this->call('get', "/lists/{$listId}/members/{$memberId}/tags");
+    }
+
     public function addTags(string $listId, string $email, array $tags): void
     {
         $email = strtolower($email);
@@ -88,7 +95,18 @@ class MailchimpApi
                 return ["name" => $tag, "status" => "active"];
             }, $tags)
         ];
+        $this->call('post', "/lists/{$listId}/members/{$memberId}/tags", $data);
+    }
 
+    public function removeTags(string $listId, string $email, array $tags): void
+    {
+        $email = strtolower($email);
+        $memberId = md5($email);
+        $data = [
+            'tags' => array_map(function($tag) {
+                return ["name" => $tag, "status" => "inactive"];
+            }, $tags)
+        ];
         $this->call('post', "/lists/{$listId}/members/{$memberId}/tags", $data);
     }
 

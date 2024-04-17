@@ -96,6 +96,16 @@ class Mailchimp
         $this->api->delete($listId, $email);
     }
 
+    public function getTags(string $listId, string $email): array
+    {
+        $response = $this->api->getTags($listId, $email);
+        $tags = [];
+        foreach ($response['tags'] ?? [] as $data) {
+            $tags[] = new Tag($data);
+        }
+        return $tags;
+    }
+
     public function addTags(string $listId, string $email, array $tags): void
     {
         $tags = array_values(array_filter($tags, function ($value) {
@@ -103,6 +113,28 @@ class Mailchimp
         }));
         if ($tags) {
             $this->api->addTags($listId, $email, $tags);
+        }
+    }
+
+    public function removeTags(string $listId, string $email, array $tags): void
+    {
+        $tags = array_values(array_filter($tags, function ($value) {
+            return is_string($value);
+        }));
+        if ($tags) {
+            $this->api->removeTags($listId, $email, $tags);
+        }
+    }
+
+    public function removeAllTags(string $listId, string $email): void
+    {
+        $response = $this->api->getTags($listId, $email);
+        $tags = [];
+        foreach ($response['tags'] as $data) {
+            $tags[] = $data['name'];
+        }
+        if ($tags) {
+            $this->api->removeTags($listId, $email, $tags);
         }
     }
 

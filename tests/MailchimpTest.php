@@ -335,4 +335,76 @@ class MailchimpTest extends TestCase
             ->method('addTags');
         $this->mc->addTags(static::LISTID, $email, $tags);
     }
+
+    /** @test */
+    public function get_tags_empty()
+    {
+        $email = 'test@example.com';
+        $this->api->expects($this->once())
+            ->method('getTags')
+            ->willReturn([]);
+        $response = $this->mc->getTags(static::LISTID, $email);
+        $this->assertEquals([], $response);
+    }
+
+    /** @test */
+    public function get_tags_with_results()
+    {
+        $tagData = ['id' => 1234, 'name' => 'tag1', 'date_added' => '2024-04-17T19:22:18+00:00'];
+        $email = 'test@example.com';
+        $this->api->expects($this->once())
+            ->method('getTags')
+            ->willReturn(['tags' => [$tagData]]);
+        $response = $this->mc->getTags(static::LISTID, $email);
+        $this->assertEquals($tagData['id'], $response[0]->id);
+        $this->assertEquals($tagData['name'], $response[0]->name);
+        $this->assertEquals($tagData['date_added'], $response[0]->dateAdded);
+    }
+
+    /** @test */
+    public function remove_tags_success()
+    {
+        $email = 'test@example.com';
+        $tags = ['a', 'b', 'c'];
+        $this->api->expects($this->once())
+            ->method('removeTags')
+            ->with(static::LISTID, $email, $tags);
+        $this->mc->removeTags(static::LISTID, $email, $tags);
+    }
+
+    /** @test */
+    public function remove_tags_skips_non_strings()
+    {
+        $email = 'test@example.com';
+        $tags = [1, 2, 'c'];
+        $this->api->expects($this->once())
+            ->method('removeTags')
+            ->with(static::LISTID, $email, ['c']);
+        $this->mc->removeTags(static::LISTID, $email, $tags);
+    }
+
+    /** @test */
+    public function remove_tags_does_not_call_api_if_list_is_empty()
+    {
+        $email = 'test@example.com';
+        $tags = [1, 2, 3];
+        $this->api->expects($this->never())
+            ->method('removeTags');
+        $this->mc->removeTags(static::LISTID, $email, $tags);
+    }
+
+    /** @test */
+    public function remove_all_tags_success()
+    {
+        $tag1Data = ['id' => 1234, 'name' => 'tag1', 'date_added' => '2024-04-17T19:22:18+00:00'];
+        $tag2Data = ['id' => 5678, 'name' => 'tag2', 'date_added' => '2024-04-17T19:22:18+00:00'];
+        $email = 'test@example.com';
+        $this->api->expects($this->once())
+            ->method('getTags')
+            ->willReturn(['tags' => [$tag1Data, $tag2Data]]);
+        $this->api->expects($this->once())
+            ->method('removeTags')
+            ->with(static::LISTID, $email, ['tag1', 'tag2']);
+        $this->mc->removeAllTags(static::LISTID, $email);
+    }
 }
