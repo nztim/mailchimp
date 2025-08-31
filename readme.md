@@ -101,6 +101,7 @@ Mailchimp::addUpdateMember('listid', $member);
 ```
 
 ### Upgrading
+- To v6.0: PHP 8.4 is required
 - To v5.0: PHP 8.1 is required
 - To v4.0:
     - PHP 7.4 | 8.0 is now required
