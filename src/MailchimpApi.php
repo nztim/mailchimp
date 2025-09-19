@@ -141,7 +141,7 @@ class MailchimpApi
         $message = "Mailchimp API error (" . $response->status() . "): " . $info;
         // Check for "...has signed up to a lot of lists very recently; we\'re not allowing more signups for now"
         if ($data['status'] === 400 &&
-            $data['title'] !== 'Invalid Resource' &&
+            $data['title'] === 'Invalid Resource' &&
             str_contains($data['detail'], 'has signed up to a lot of lists very recently')) {
             throw new MailchimpBadEmailAddressException($message, $this->responseCode);
         }
