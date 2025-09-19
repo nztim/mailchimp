@@ -1,5 +1,6 @@
 <?php namespace NZTim\Mailchimp;
 
+use NZTim\Mailchimp\Exception\MailchimpBadEmailAddressException;
 use NZTim\Mailchimp\Exception\MailchimpBadRequestException;
 use NZTim\Mailchimp\Exception\MailchimpException;
 use NZTim\Mailchimp\Exception\MailchimpInternalErrorException;
@@ -91,9 +92,9 @@ class MailchimpApi
         $email = strtolower($email);
         $memberId = md5($email);
         $data = [
-            'tags' => array_map(function($tag) {
+            'tags' => array_map(function ($tag) {
                 return ["name" => $tag, "status" => "active"];
-            }, $tags)
+            }, $tags),
         ];
         $this->call('post', "/lists/{$listId}/members/{$memberId}/tags", $data);
     }
@@ -103,9 +104,9 @@ class MailchimpApi
         $email = strtolower($email);
         $memberId = md5($email);
         $data = [
-            'tags' => array_map(function($tag) {
+            'tags' => array_map(function ($tag) {
                 return ["name" => $tag, "status" => "inactive"];
-            }, $tags)
+            }, $tags),
         ];
         $this->call('post', "/lists/{$listId}/members/{$memberId}/tags", $data);
     }
@@ -135,8 +136,16 @@ class MailchimpApi
 
     protected function apiError(HttpResponse $response): void
     {
-        $info = var_export($response->json(), true);
+        $data = $response->json();
+        $info = var_export($data, true);
         $message = "Mailchimp API error (" . $response->status() . "): " . $info;
+        // Check for "...has signed up to a lot of lists very recently; we\'re not allowing more signups for now"
+        if ($data['status'] === 400 &&
+            $data['title'] !== 'Invalid Resource' &&
+            str_contains($data['detail'], 'has signed up to a lot of lists very recently')) {
+            throw new MailchimpBadEmailAddressException($message, $this->responseCode);
+        }
+        // Categorise other errors
         if ($this->responseCode <= 499) {
             throw new MailchimpBadRequestException($message, $this->responseCode, null, $response->body());
         }
